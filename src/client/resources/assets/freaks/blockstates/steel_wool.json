@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"lit=true": {
+			"model": "freaks:block/steel_wool/flaming"
+		},
+		"lit=false": {
+			"model": "freaks:block/steel_wool/default"
+		}
+	}
+}

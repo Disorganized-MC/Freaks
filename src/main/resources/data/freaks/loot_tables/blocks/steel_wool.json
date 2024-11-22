@@ -1,0 +1,28 @@
+{
+	"type": "minecraft:block",
+	"pools": [
+		{
+			"rolls": 1,
+			"bonus_rolls": 0,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "freaks:steel_wool"
+				}
+			],
+			"conditions": [
+				{
+					"condition": "minecraft:survives_explosion"
+				},
+				{
+					"condition": "minecraft:block_state_property",
+					"block": "freaks:steel_wool",
+					"properties": {
+						"lit": "false"
+					}
+				}
+			]
+		}
+	],
+	"random_sequence": "freaks:blocks/steel_wool"
+}

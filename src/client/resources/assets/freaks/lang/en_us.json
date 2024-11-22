@@ -1,0 +1,8 @@
+{
+	"block.freaks.steel_wool": "Steel Wool",
+
+	"subtitles.block.freaks.steel_wool.scrub": "Steel Wool scrubs",
+
+	"death.attack.steel_wool": "%1$s was scrubbed to death",
+	"death.attack.steel_wool.player": "%1$s walked into steel wool whilst trying to escape %2$s"
+}
