@@ -1,7 +1,13 @@
 {
+	"item.freaks.sheeper_spawn_egg": "Sheeper Spawn Egg",
+
 	"block.freaks.steel_wool": "Steel Wool",
 
 	"subtitles.block.freaks.steel_wool.scrub": "Steel Wool scrubs",
+	"subtitles.entity.freaks.sheeper.ambient": "Sheeper baahs..?",
+	"subtitles.entity.freaks.sheeper.death": "Sheeper dies",
+	"subtitles.entity.freaks.sheeper.hurt": "Sheeper hurts",
+	"subtitles.entity.freaks.sheeper.primed": "Sheeper hisses..?",
 
 	"death.attack.steel_wool": "%1$s was scrubbed to death",
 	"death.attack.steel_wool.player": "%1$s walked into steel wool whilst trying to escape %2$s"

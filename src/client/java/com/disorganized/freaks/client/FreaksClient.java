@@ -2,6 +2,7 @@ package com.disorganized.freaks.client;
 
 import com.disorganized.freaks.client.registry.ModEntityRenderers;
 import com.disorganized.freaks.registry.ModBlocks;
+import com.disorganized.freaks.registry.ModItems;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.Blocks;
@@ -14,6 +15,9 @@ public class FreaksClient implements ClientModInitializer {
 		ModEntityRenderers.init();
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content ->
 			content.addAfter(Blocks.MAGMA_BLOCK, ModBlocks.STEEL_WOOL)
+		);
+		ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(content ->
+			content.add(ModItems.SHEEPER_SPAWN_EGG)
 		);
 	}
 

@@ -2,11 +2,13 @@ package com.disorganized.freaks.content.entity;
 
 import com.disorganized.freaks.content.entity.ai.goal.EatIronGoal;
 import com.disorganized.freaks.registry.ModLootTables;
+import com.disorganized.freaks.registry.ModSoundEvents;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -22,18 +24,19 @@ import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.UnaryOperator;
 
-public class SheeperEntity extends CreeperEntity {
+public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
 	private static final int MAX_IRON_TIMER = 40;
 	private static final int MAX_WOOL_LAYERS = 4;
@@ -166,7 +169,7 @@ public class SheeperEntity extends CreeperEntity {
 	}
 
 	public void sheared() {
-		this.getWorld().playSoundFromEntity(null, this, SoundEvents.ENTITY_SHEEP_SHEAR, SoundCategory.PLAYERS, 1.0F, 1.0F);
+		this.getWorld().playSoundFromEntity(null, this, ModSoundEvents.ENTITY_SHEEPER_SHEAR, SoundCategory.PLAYERS, 1.0F, 1.0F);
 		this.modifyWoolLayers(i -> --i);
 
 		ServerWorld world = (ServerWorld)this.getWorld();
@@ -190,6 +193,26 @@ public class SheeperEntity extends CreeperEntity {
 		}
 	}
 
+
+	@Override
+	protected SoundEvent getHurtSound(DamageSource source) {
+		return ModSoundEvents.ENTITY_SHEEPER_HURT;
+	}
+
+	@Override
+	protected SoundEvent getDeathSound() {
+		return ModSoundEvents.ENTITY_SHEEPER_DEATH;
+	}
+
+	@Override
+	protected @Nullable SoundEvent getAmbientSound() {
+		return ModSoundEvents.ENTITY_SHEEPER_AMBIENT;
+	}
+
+	@Override
+	public SoundEvent getPrimedSound() {
+		return ModSoundEvents.ENTITY_SHEEPER_PRIMED;
+	}
 
 	public static DefaultAttributeContainer.Builder createMobAttributes() {
 		return CreeperEntity.createMobAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.1);

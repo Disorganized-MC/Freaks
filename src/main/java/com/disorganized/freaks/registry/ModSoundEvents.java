@@ -16,7 +16,6 @@ public class ModSoundEvents {
 	public static final SoundEvent ENTITY_SHEEPER_DEATH = register("entity.freaks.sheeper.death");
 	public static final SoundEvent ENTITY_SHEEPER_HURT = register("entity.freaks.sheeper.hurt");
 	public static final SoundEvent ENTITY_SHEEPER_PRIMED = register("entity.freaks.sheeper.primed");
-	public static final SoundEvent ENTITY_SHEEPER_STEP = register("entity.freaks.sheeper.step");
 	public static final SoundEvent ENTITY_SHEEPER_SHEAR = register("entity.freaks.sheeper.shear");
 
 	private static SoundEvent register(String path) {

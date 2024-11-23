@@ -30,5 +30,40 @@
 			}
 		],
 		"subtitle": "subtitles.block.freaks.steel_wool.scrub"
+	},
+	"entity.freaks.sheeper.ambient": {
+		"sounds": [
+			"mob/sheep/say1",
+			"mob/sheep/say2",
+			"mob/sheep/say3"
+		],
+		"subtitle": "subtitles.entity.freaks.sheeper.ambient"
+	},
+	"entity.freaks.sheeper.death": {
+		"sounds": [
+			"mob/creeper/death"
+		],
+		"subtitle": "subtitles.entity.freaks.sheeper.death"
+	},
+	"entity.freaks.sheeper.hurt": {
+		"sounds": [
+			"mob/creeper/say1",
+			"mob/creeper/say2",
+			"mob/creeper/say3",
+			"mob/creeper/say4"
+		],
+		"subtitle": "subtitles.entity.freaks.sheeper.hurt"
+	},
+	"entity.freaks.sheeper.primed": {
+		"sounds": [
+			"random/fuse"
+		],
+		"subtitle": "subtitles.entity.freaks.sheeper.primed"
+	},
+	"entity.freaks.sheeper.shear": {
+		"sounds": [
+			"mob/sheep/shear"
+		],
+		"subtitle": "subtitles.item.shears.shear"
 	}
 }

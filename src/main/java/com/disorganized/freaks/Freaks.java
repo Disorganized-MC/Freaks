@@ -20,6 +20,7 @@ public class Freaks implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		ModItems.init();
 		ModBlocks.init();
 		ModBlockTags.init();
 		ModDamageTypes.init();
