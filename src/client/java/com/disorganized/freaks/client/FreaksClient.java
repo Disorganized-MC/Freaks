@@ -1,5 +1,6 @@
 package com.disorganized.freaks.client;
 
+import com.disorganized.freaks.client.registry.ModEntityRenderers;
 import com.disorganized.freaks.registry.ModBlocks;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -10,6 +11,7 @@ public class FreaksClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		ModEntityRenderers.init();
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content ->
 			content.addAfter(Blocks.MAGMA_BLOCK, ModBlocks.STEEL_WOOL)
 		);

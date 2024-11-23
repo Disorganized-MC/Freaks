@@ -1,8 +1,6 @@
 package com.disorganized.freaks;
 
-import com.disorganized.freaks.registry.ModBlocks;
-import com.disorganized.freaks.registry.ModDamageTypes;
-import com.disorganized.freaks.registry.ModSoundEvents;
+import com.disorganized.freaks.registry.*;
 import net.fabricmc.api.ModInitializer;
 
 import net.minecraft.block.Blocks;
@@ -23,8 +21,10 @@ public class Freaks implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModBlocks.init();
+		ModBlockTags.init();
 		ModDamageTypes.init();
 		ModSoundEvents.init();
+		ModEntityTypes.init();
 		LOGGER.info("Initialized!");
 	}
 
