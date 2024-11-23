@@ -1,42 +1,40 @@
 package com.disorganized.freaks.client.content.entity.model;
 
 import net.minecraft.client.model.*;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.QuadrupedEntityModel;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 
-public class SheeperEntityWoolModel<T extends Entity> extends QuadrupedEntityModel<T> {
+public class SheeperEntityWoolModel<T extends Entity> extends EntityModel<T> {
 
-	private float headAngle;
+	private final ModelPart head;
+	private final ModelPart body;
 
 	public SheeperEntityWoolModel(ModelPart root) {
-		super(root, false, 8.0F, 4.0F, 2.0F, 2.0F, 24);
+		this.head = root.getChild("head");
+		this.body = root.getChild("body");
 	}
 
-	public static TexturedModelData getTexturedModelData(Dilation dilation) {
+	public static TexturedModelData getTexturedModelData() {
 		ModelData modelData = new ModelData();
 		ModelPartData modelPartData = modelData.getRoot();
-		ModelPartData body = modelPartData.addChild("body", ModelPartBuilder.create().uv(0, 72).cuboid(-3.0F, -11.0F, -2.9167F, 6.0F, 4.0F, 6.0F, new Dilation(0.0F))
-			.uv(49, 70).cuboid(-3.0F, -15.0F, -4.9167F, 6.0F, 4.0F, 8.0F, new Dilation(0.0F))
-			.uv(49, 0).cuboid(-5.0F, -7.0F, -4.9167F, 10.0F, 10.0F, 10.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 16.0F, -0.0833F));
+		modelPartData.addChild("head", ModelPartBuilder.create().uv(49, 54).cuboid(-6.0F, -6.0F, -4.0F, 12.0F, 12.0F, 3.0F, new Dilation(0.0F))
+			.uv(49, 38).cuboid(-6.0F, -6.0F, -4.0F, 12.0F, 12.0F, 3.0F, new Dilation(0.5F)), ModelTransform.pivot(0.0F, 3.0F, -5.0F));
 
-		ModelPartData head = body.addChild("head", ModelPartBuilder.create().uv(49, 21).cuboid(-4.0F, -4.0F, -8.0F, 8.0F, 8.0F, 8.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, -13.0F, -4.9167F));
-
-		ModelPartData leg1 = modelPartData.addChild("right_front_leg", ModelPartBuilder.create().uv(25, 72).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(-5.0F, 18.0F, -5.0F));
-		ModelPartData leg2 = modelPartData.addChild("left_front_leg", ModelPartBuilder.create().uv(78, 70).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(5.0F, 18.0F, -5.0F));
-		ModelPartData leg3 = modelPartData.addChild("right_hind_leg", ModelPartBuilder.create().uv(80, 38).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(-5.0F, 18.0F, 5.0F));
-		ModelPartData leg4 = modelPartData.addChild("left_hind_leg", ModelPartBuilder.create().uv(80, 49).cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 6.0F, 4.0F, new Dilation(0.0F)), ModelTransform.pivot(5.0F, 18.0F, 5.0F));
-
+		modelPartData.addChild("body", ModelPartBuilder.create().uv(0, 36).cuboid(-11.0F, -22.0F, 10.0F, 12.0F, 23.0F, 12.0F, new Dilation(0.5F))
+			.uv(0, 0).cuboid(-11.0F, -22.0F, 10.0F, 12.0F, 23.0F, 12.0F, new Dilation(0.0F)), ModelTransform.pivot(5.0F, 19.0F, -16.0F));
 		return TexturedModelData.of(modelData, 128, 128);
 	}
 
-	public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {
-		this.head.yaw = headYaw * 0.017453292F;
-		this.head.pitch = headPitch * 0.017453292F;
-		this.leftHindLeg.pitch = MathHelper.cos(limbAngle * 0.6662F) * 1.4F * limbDistance;
-		this.rightHindLeg.pitch = MathHelper.cos(limbAngle * 0.6662F + 3.1415927F) * 1.4F * limbDistance;
-		this.leftFrontLeg.pitch = MathHelper.cos(limbAngle * 0.6662F + 3.1415927F) * 1.4F * limbDistance;
-		this.rightFrontLeg.pitch = MathHelper.cos(limbAngle * 0.6662F) * 1.4F * limbDistance;
+	public void setAngles(T entity, float limbAngle, float limbDistance, float animationProgress, float headYaw, float headPitch) {}
+
+	@Override
+	public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+		head.render(matrices, vertices, light, overlay, red, green, blue, alpha);
+		body.render(matrices, vertices, light, overlay, red, green, blue, alpha);
 	}
 
 }
