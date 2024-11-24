@@ -22,7 +22,7 @@ public class ModEntityTypes {
 			.dimensions(new EntityDimensions(1, 1.5F, true))
 	);
 
-	public static <T extends Entity> EntityType<T> register(String path, FabricEntityTypeBuilder<T> builder) {
+	private static <T extends Entity> EntityType<T> register(String path, FabricEntityTypeBuilder<T> builder) {
 		return Registry.register(Registries.ENTITY_TYPE, Freaks.of(path), builder.build());
 	}
 

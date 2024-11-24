@@ -152,7 +152,7 @@ public class SteelWoolBlock extends Block implements Ignitable {
         List<BlockPos> neighbours = getNeighbours(pos);
         for (BlockPos nPos : neighbours) {
             BlockState nState = world.getBlockState(nPos);
-            if (nState.getBlock() instanceof Oxidizable) scrubState(world, nState, nPos);
+            if (nState.getBlock() instanceof Oxidizable) scrubState(world, nState, nPos, state.get(LIT));
         }
     }
 
@@ -167,15 +167,34 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		);
 	}
 
-    public void scrubState(World world, BlockState state, BlockPos pos) {
-        Optional<BlockState> scrubbedState = Oxidizable.getDecreasedOxidationState(state);
-        if (scrubbedState.isEmpty()) return;
+	public void scrubState(World world, BlockState state, BlockPos pos, boolean lit) {
+		BlockState scrubbedState = null;
+		Optional<BlockState> maybeState = Oxidizable.getDecreasedOxidationState(state);
+		if (lit) {
+			while (maybeState.isPresent()) {
+				scrubbedState = maybeState.get();
+				maybeState = Oxidizable.getDecreasedOxidationState(scrubbedState);
+			}
+		} else {
+			if (maybeState.isPresent()) scrubbedState = maybeState.get();
+		}
+		if (scrubbedState == null) return;
 
-        world.setBlockState(pos, scrubbedState.get());
+        world.setBlockState(pos, scrubbedState);
         world.playSound(null, pos, ModSoundEvents.BLOCK_STEEL_WOOL_SCRUB, SoundCategory.BLOCKS, 1.0F, 1.0F);
 		// i hate these magic bullshit methods
 		world.syncWorldEvent(null, 3004, pos, 0);
 	}
+
+//    public void scrubState(World world, BlockState state, BlockPos pos, boolean lit) {
+//        Optional<BlockState> scrubbedState = Oxidizable.getDecreasedOxidationState(state);
+//        if (scrubbedState.isEmpty()) return;
+//
+//        world.setBlockState(pos, scrubbedState.get());
+//        world.playSound(null, pos, ModSoundEvents.BLOCK_STEEL_WOOL_SCRUB, SoundCategory.BLOCKS, 1.0F, 1.0F);
+//		// i hate these magic bullshit methods
+//		world.syncWorldEvent(null, 3004, pos, 0);
+//	}
 
 	// TODO make this actually work i give up for now
     @Override

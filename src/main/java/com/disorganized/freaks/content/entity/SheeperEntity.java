@@ -3,6 +3,7 @@ package com.disorganized.freaks.content.entity;
 import com.disorganized.freaks.content.entity.ai.goal.EatIronGoal;
 import com.disorganized.freaks.registry.ModLootTables;
 import com.disorganized.freaks.registry.ModSoundEvents;
+import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.ai.goal.*;
@@ -38,13 +39,11 @@ import java.util.function.UnaryOperator;
 
 public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
-	private static final int MAX_IRON_TIMER = 40;
 	private static final int MAX_WOOL_LAYERS = 4;
 
 	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	private static final TrackedData<Boolean> FLAMING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
-	private int eatIronTimer;
 	private EatIronGoal eatIronGoal;
 
 	public SheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
@@ -109,48 +108,24 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
 
 	@Override
-	protected void mobTick() {
-		this.eatIronTimer = this.eatIronGoal.getTimer();
-		super.mobTick();
-	}
-
-	@Override
-	public void tickMovement() {
-		if (this.getWorld().isClient)
-			this.eatIronTimer = Math.max(0, this.eatIronTimer - 1);
-		super.tickMovement();
-	}
-
-	@Override
 	public void handleStatus(byte status) {
-		if (status == 10) {
-			this.eatIronTimer = MAX_IRON_TIMER;
-		} else {
-			super.handleStatus(status);
-		}
+		this.eatIronGoal.reset();
 	}
 
 	public float getNeckAngle(float delta) {
-		int start = 4;
-		int end = MAX_IRON_TIMER - start;
-		if (this.eatIronTimer <= 0) {
-			return 0.0F;
-		} else if (this.eatIronTimer >= start && this.eatIronTimer <= end) {
-			return 1.0F;
-		} else {
-			return this.eatIronTimer < start ? ((float)this.eatIronTimer - delta) / start : -((float)(this.eatIronTimer - MAX_IRON_TIMER) - delta) / start;
-		}
+		if (this.eatIronGoal == null) return 1;
+		return this.eatIronGoal.getNeckAngle(delta);
 	}
 
 	public float getHeadAngle(float delta) {
-		int start = 4;
-		int end = MAX_IRON_TIMER - start;
-		if (this.eatIronTimer > start && this.eatIronTimer <= end) {
-			float f = ((float)(this.eatIronTimer - start) - delta) / 32.0F;
-			return 0.62831855F + 0.21991149F * MathHelper.sin(f * 28.7F);
-		} else {
-			return this.eatIronTimer > 0 ? 0.62831855F : this.getPitch() * 0.017453292F;
-		}
+		if (this.eatIronGoal == null) return this.getPitch() * 0.017453292F;
+		return this.eatIronGoal.getHeadAngle(delta, this.getPitch());
+	}
+
+	@Override
+	public void onEatingGrass() {
+		super.onEatingGrass();
+		this.modifyWoolLayers(i -> ++i);
 	}
 
 	@Override

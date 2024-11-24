@@ -11,7 +11,7 @@ public class ModDamageTypes {
 
 	public static final RegistryKey<DamageType> STEEL_WOOL = of("steel_wool");
 
-	public static RegistryKey<DamageType> of(String path) {
+	private static RegistryKey<DamageType> of(String path) {
 		return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Freaks.of(path));
 	}
 

@@ -17,7 +17,7 @@ import net.minecraft.sound.BlockSoundGroup;
 public class ModBlocks {
 
     public static void init() {
-		((FireBlockInvoker)Blocks.FIRE).invokeRegisterFlammableBlock(STEEL_WOOL, 15, 200);
+		((FireBlockInvoker)Blocks.FIRE).invokeRegisterFlammableBlock(STEEL_WOOL, 15, 400);
 	}
 
     public static final Block STEEL_WOOL = register("steel_wool", new SteelWoolBlock(

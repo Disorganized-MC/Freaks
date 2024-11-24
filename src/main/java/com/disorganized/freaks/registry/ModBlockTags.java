@@ -11,7 +11,7 @@ public class ModBlockTags {
 
 	public static final TagKey<Block> SHEEPER_PASTURES = of("sheeper_pastures");
 
-	public static TagKey<Block> of(String path) {
+	private static TagKey<Block> of(String path) {
 		return TagKey.of(RegistryKeys.BLOCK, Freaks.of(path));
 	}
 
