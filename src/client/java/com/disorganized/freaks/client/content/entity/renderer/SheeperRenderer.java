@@ -1,8 +1,8 @@
 package com.disorganized.freaks.client.content.entity.renderer;
 
 import com.disorganized.freaks.Freaks;
-import com.disorganized.freaks.client.content.entity.feature.SheeperEntityWoolRenderer;
-import com.disorganized.freaks.client.content.entity.model.SheeperEntityModel;
+import com.disorganized.freaks.client.content.entity.feature.SheeperWoolRenderer;
+import com.disorganized.freaks.client.content.entity.model.SheeperModel;
 import com.disorganized.freaks.client.registry.ModEntityRenderers;
 import com.disorganized.freaks.content.entity.SheeperEntity;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -11,13 +11,13 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-public class SheeperEntityRenderer extends MobEntityRenderer<SheeperEntity, SheeperEntityModel<SheeperEntity>> {
+public class SheeperRenderer extends MobEntityRenderer<SheeperEntity, SheeperModel<SheeperEntity>> {
 
 	private static final Identifier TEXTURE = Freaks.of("textures/entity/sheeper/default.png");
 
-	public SheeperEntityRenderer(EntityRendererFactory.Context context) {
-		super(context, new SheeperEntityModel<>(context.getPart(ModEntityRenderers.SHEEPER_LAYER)), 0.5F);
-		this.addFeature(new SheeperEntityWoolRenderer(this, context.getModelLoader()));
+	public SheeperRenderer(EntityRendererFactory.Context context) {
+		super(context, new SheeperModel<>(context.getPart(ModEntityRenderers.SHEEPER_LAYER)), 0.5F);
+		this.addFeature(new SheeperWoolRenderer(this, context.getModelLoader()));
 	}
 
 	protected void scale(SheeperEntity entity, MatrixStack matrixStack, float f) {

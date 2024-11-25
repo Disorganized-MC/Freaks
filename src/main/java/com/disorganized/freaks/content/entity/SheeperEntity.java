@@ -1,6 +1,7 @@
 package com.disorganized.freaks.content.entity;
 
 import com.disorganized.freaks.content.entity.ai.goal.EatIronGoal;
+import com.disorganized.freaks.content.entity.ai.goal.SheeperFleeGoal;
 import com.disorganized.freaks.registry.ModLootTables;
 import com.disorganized.freaks.registry.ModSoundEvents;
 import net.minecraft.entity.AnimationState;
@@ -14,7 +15,8 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.entity.passive.PassiveEntity;
+import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.entity.passive.OcelotEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -28,7 +30,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
@@ -39,12 +40,15 @@ import java.util.function.UnaryOperator;
 
 public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
+	public final AnimationState grazingAnimation = new AnimationState();
+
 	private static final int MAX_WOOL_LAYERS = 4;
 
 	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	private static final TrackedData<Boolean> FLAMING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
-	private EatIronGoal eatIronGoal;
+	private boolean wasGrazing = false;
 
 	public SheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
 		super(entityType, world);
@@ -55,20 +59,20 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 		super.initDataTracker();
 		this.dataTracker.startTracking(WOOL_LAYERS, MAX_WOOL_LAYERS);
 		this.dataTracker.startTracking(FLAMING, false);
+		this.dataTracker.startTracking(GRAZING, false);
 	}
 
 	@Override
 	protected void initGoals() {
-		this.eatIronGoal = new EatIronGoal(this);
 		this.goalSelector.add(1, new SwimGoal(this));
-		this.goalSelector.add(1, new EscapeDangerGoal(this, 1.25));
 		this.goalSelector.add(2, new CreeperIgniteGoal(this));
-		this.goalSelector.add(3, new FleeEntityGoal<>(this, PassiveEntity.class, 6.0F, 1.0, 1.2));
-		this.goalSelector.add(3, new FleeEntityGoal<>(this, PlayerEntity.class, 6.0F, 1.0, 1.2));
-		this.goalSelector.add(5, this.eatIronGoal);
-		this.goalSelector.add(5, new WanderAroundFarGoal(this, 0.8));
-		this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 8.0F));
-		this.goalSelector.add(6, new LookAroundGoal(this));
+		this.goalSelector.add(3, new SheeperFleeGoal<>(this, CatEntity.class, 6));
+		this.goalSelector.add(3, new SheeperFleeGoal<>(this, OcelotEntity.class, 6));
+		this.goalSelector.add(3, new SheeperFleeGoal<>(this, PlayerEntity.class, 6));
+		this.goalSelector.add(4, new EatIronGoal(this));
+		this.goalSelector.add(6, new WanderAroundFarGoal(this, 1));
+		this.goalSelector.add(7, new LookAtEntityGoal(this, PlayerEntity.class, 8));
+		this.goalSelector.add(8, new LookAroundGoal(this));
 	}
 
 	public int getWoolLayers() {
@@ -76,7 +80,12 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	}
 
 	public void modifyWoolLayers(UnaryOperator<Integer> function) {
-		this.dataTracker.set(WOOL_LAYERS, function.apply(this.dataTracker.get(WOOL_LAYERS)));
+		int layers = function.apply(this.dataTracker.get(WOOL_LAYERS));
+		this.dataTracker.set(WOOL_LAYERS, layers);
+	}
+
+	public boolean canGrowWool() {
+		return getWoolLayers() <= MAX_WOOL_LAYERS;
 	}
 
 	public boolean isShearable() {
@@ -91,6 +100,13 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 		this.dataTracker.set(FLAMING, flaming);
 	}
 
+	public boolean isGrazing() {
+		return this.dataTracker.get(GRAZING);
+	}
+
+	public void setGrazing(boolean grazing) {
+		this.dataTracker.set(GRAZING, grazing);
+	}
 
 	@Override
 	public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -108,18 +124,13 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
 
 	@Override
-	public void handleStatus(byte status) {
-		this.eatIronGoal.reset();
-	}
+	public void tick() {
+		super.tick();
+		if (!this.getWorld().isClient) return;
 
-	public float getNeckAngle(float delta) {
-		if (this.eatIronGoal == null) return 1;
-		return this.eatIronGoal.getNeckAngle(delta);
-	}
-
-	public float getHeadAngle(float delta) {
-		if (this.eatIronGoal == null) return this.getPitch() * 0.017453292F;
-		return this.eatIronGoal.getHeadAngle(delta, this.getPitch());
+		if (this.isGrazing()) this.grazingAnimation.startIfNotRunning(this.age);
+		else this.grazingAnimation.stop();
+		this.wasGrazing = this.isGrazing();
 	}
 
 	@Override
@@ -190,7 +201,7 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	}
 
 	public static DefaultAttributeContainer.Builder createMobAttributes() {
-		return CreeperEntity.createMobAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.1);
+		return CreeperEntity.createMobAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25);
 	}
 
 }

@@ -19,7 +19,7 @@ public class ModEntityTypes {
 
 	public static final EntityType<SheeperEntity> SHEEPER = register("sheeper",
 		FabricEntityTypeBuilder.create(SpawnGroup.MONSTER, SheeperEntity::new)
-			.dimensions(new EntityDimensions(1, 1.5F, true))
+			.dimensions(new EntityDimensions(1, 1.625F, true))
 	);
 
 	private static <T extends Entity> EntityType<T> register(String path, FabricEntityTypeBuilder<T> builder) {
