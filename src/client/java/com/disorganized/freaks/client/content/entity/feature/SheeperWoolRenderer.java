@@ -26,8 +26,8 @@ public class SheeperWoolRenderer extends FeatureRenderer<SheeperEntity, SheeperM
 
 	@Override
 	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, SheeperEntity entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch) {
-		if (!entity.isShearable()) return;
-		Identifier texture = entity.isFlaming() ? FLAMING : DEFAULT;
+		if (entity.getWoolLayers() == 0) return;
+		Identifier texture = entity.isOnFire() ? FLAMING : DEFAULT;
 		render(this.getContextModel(), this.model, texture, matrices, vertexConsumers, light, entity, limbAngle, limbDistance, tickDelta, animationProgress, headYaw, headPitch, 1, 1, 1);
 	}
 

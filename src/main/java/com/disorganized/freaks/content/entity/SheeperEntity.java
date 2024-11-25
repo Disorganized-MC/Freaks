@@ -40,15 +40,14 @@ import java.util.function.UnaryOperator;
 
 public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
-	public final AnimationState grazingAnimation = new AnimationState();
+	public final AnimationState startGrazingState = new AnimationState();
+	public final AnimationState stopGrazingState = new AnimationState();
+
 
 	private static final int MAX_WOOL_LAYERS = 4;
 
 	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
-	private static final TrackedData<Boolean> FLAMING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-
-	private boolean wasGrazing = false;
 
 	public SheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
 		super(entityType, world);
@@ -58,7 +57,6 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	protected void initDataTracker() {
 		super.initDataTracker();
 		this.dataTracker.startTracking(WOOL_LAYERS, MAX_WOOL_LAYERS);
-		this.dataTracker.startTracking(FLAMING, false);
 		this.dataTracker.startTracking(GRAZING, false);
 	}
 
@@ -79,9 +77,16 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 		return this.dataTracker.get(WOOL_LAYERS);
 	}
 
-	public void modifyWoolLayers(UnaryOperator<Integer> function) {
-		int layers = function.apply(this.dataTracker.get(WOOL_LAYERS));
+	private void setWoolLayers(int layers) {
 		this.dataTracker.set(WOOL_LAYERS, layers);
+	}
+
+	public void addWoolLayer() {
+		this.setWoolLayers(this.dataTracker.get(WOOL_LAYERS) + 1);
+	}
+
+	public void removeWoolLayer() {
+		this.setWoolLayers(this.dataTracker.get(WOOL_LAYERS) - 1);
 	}
 
 	public boolean canGrowWool() {
@@ -89,15 +94,7 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	}
 
 	public boolean isShearable() {
-		return this.isAlive() && this.getWoolLayers() != 0 && !this.isFlaming();
-	}
-
-	public boolean isFlaming() {
-		return this.dataTracker.get(FLAMING);
-	}
-
-	public void setFlaming(boolean flaming) {
-		this.dataTracker.set(FLAMING, flaming);
+		return this.isAlive() && this.getWoolLayers() != 0 && !this.isOnFire();
 	}
 
 	public boolean isGrazing() {
@@ -112,14 +109,12 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	public void writeCustomDataToNbt(NbtCompound nbt) {
 		super.writeCustomDataToNbt(nbt);
 		nbt.putInt("wool_layers", this.getWoolLayers());
-		nbt.putBoolean("flaming", this.isFlaming());
 	}
 
 	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
-		this.modifyWoolLayers(i -> nbt.getInt("wool_layers"));
-		this.setFlaming(nbt.getBoolean("flaming"));
+		this.setWoolLayers(nbt.getInt("wool_layers"));
 	}
 
 
@@ -128,15 +123,20 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 		super.tick();
 		if (!this.getWorld().isClient) return;
 
-		if (this.isGrazing()) this.grazingAnimation.startIfNotRunning(this.age);
-		else this.grazingAnimation.stop();
-		this.wasGrazing = this.isGrazing();
+//		if (this.isGrazing()) {
+//			this.startGrazingState.startIfNotRunning(this.age);
+//			this.stopGrazingState.stop();
+//		} else {
+//			this.stopGrazingState.startIfNotRunning(this.age);
+//			this.startGrazingState.stop();
+//		}
+//		this.wasGrazing = this.isGrazing();
 	}
 
 	@Override
 	public void onEatingGrass() {
 		super.onEatingGrass();
-		this.modifyWoolLayers(i -> ++i);
+		this.addWoolLayer();
 	}
 
 	@Override
@@ -156,7 +156,7 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
 	public void sheared() {
 		this.getWorld().playSoundFromEntity(null, this, ModSoundEvents.ENTITY_SHEEPER_SHEAR, SoundCategory.PLAYERS, 1.0F, 1.0F);
-		this.modifyWoolLayers(i -> --i);
+		this.removeWoolLayer();
 
 		ServerWorld world = (ServerWorld)this.getWorld();
 		LootTable table = world.getServer().getLootManager().getLootTable(ModLootTables.SHEEPER_SHEARED);

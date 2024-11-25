@@ -54,18 +54,28 @@ public class SheeperModel<T extends SheeperEntity> extends SinglePartEntityModel
 		this.leftFrontLeg.pitch = MathHelper.cos(limbAngle * 0.6662F + 3.1415927F) * 1.4F * limbDistance;
 		this.rightFrontLeg.pitch = MathHelper.cos(limbAngle * 0.6662F) * 1.4F * limbDistance;
 
-		if (!this.previousGrazingState && entity.grazingAnimation.isRunning()) {
-			System.out.println("start");
-//			this.animate(SheeperAnimations.GRAZE_START);
-//			this.updateAnimation(entity.grazingAnimation, SheeperAnimations.GRAZE_START, animationProgress);
+
+//		this.updateAnimation(entity.startGrazingState, SheeperAnimations.START_GRAZING, animationProgress, 1.0F);
+//		this.updateAnimation(entity.stopGrazingState, SheeperAnimations.STOP_GRAZING, animationProgress, 1.0F);
+		if (entity.startGrazingState.isRunning()) {
+			this.updateAnimation(entity.startGrazingState, SheeperAnimations.LOOP_GRAZING, animationProgress, 1.0F);
+//			this.animate(SheeperAnimations.LOOP_GRAZING);
 		}
-		if (this.previousGrazingState && !entity.grazingAnimation.isRunning()) {
-			System.out.println("end");
-			this.animate(SheeperAnimations.GRAZE_END);
-//			this.updateAnimation(entity.grazingAnimation, SheeperAnimations.GRAZE_END, animationProgress);
-		}
-		this.updateAnimation(entity.grazingAnimation, SheeperAnimations.GRAZE_LOOP, animationProgress);
-		this.previousGrazingState = entity.grazingAnimation.isRunning();
+		this.updateAnimation(entity.startGrazingState, SheeperAnimations.LOOP_GRAZING, animationProgress, 1.0F);
+
+
+//		if (!this.previousGrazingState && entity.grazingAnimation.isRunning()) {
+//			System.out.println("start");
+////			this.animate(SheeperAnimations.GRAZE_START);
+////			this.updateAnimation(entity.grazingAnimation, SheeperAnimations.GRAZE_START, animationProgress);
+//		}
+//		if (this.previousGrazingState && !entity.grazingAnimation.isRunning()) {
+//			System.out.println("end");
+//			this.animate(SheeperAnimations.STOP_GRAZING);
+////			this.updateAnimation(entity.grazingAnimation, SheeperAnimations.GRAZE_END, animationProgress);
+//		}
+//		this.updateAnimation(entity.grazingAnimation, SheeperAnimations.LOOP_GRAZING, animationProgress);
+//		this.previousGrazingState = entity.grazingAnimation.isRunning();
 	}
 
 	@Override
