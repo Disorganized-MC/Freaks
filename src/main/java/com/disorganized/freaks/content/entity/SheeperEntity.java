@@ -43,11 +43,11 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	public final AnimationState startGrazingState = new AnimationState();
 	public final AnimationState stopGrazingState = new AnimationState();
 
-
 	private static final int MAX_WOOL_LAYERS = 4;
 
 	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	private float fuseTimeMultiplier = 0.5f;
 
 	public SheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
 		super(entityType, world);
@@ -63,7 +63,6 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	@Override
 	protected void initGoals() {
 		this.goalSelector.add(1, new SwimGoal(this));
-		this.goalSelector.add(2, new CreeperIgniteGoal(this));
 		this.goalSelector.add(3, new SheeperFleeGoal<>(this, CatEntity.class, 6));
 		this.goalSelector.add(3, new SheeperFleeGoal<>(this, OcelotEntity.class, 6));
 		this.goalSelector.add(3, new SheeperFleeGoal<>(this, PlayerEntity.class, 6));
@@ -82,10 +81,12 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	}
 
 	public void addWoolLayer() {
+		this.fuseTimeMultiplier += 0.5f;
 		this.setWoolLayers(this.dataTracker.get(WOOL_LAYERS) + 1);
 	}
 
 	public void removeWoolLayer() {
+		this.fuseTimeMultiplier -= 0.5f;
 		this.setWoolLayers(this.dataTracker.get(WOOL_LAYERS) - 1);
 	}
 
@@ -94,7 +95,7 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	}
 
 	public boolean isShearable() {
-		return this.isAlive() && this.getWoolLayers() != 0 && !this.isOnFire();
+		return this.isAlive() && this.getWoolLayers() > 0 && !this.isOnFire();
 	}
 
 	public boolean isGrazing() {
@@ -119,17 +120,28 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 
 
 	@Override
+	public void explode() {
+		if (!this.getWorld().isClient) {
+			float f = this.shouldRenderOverlay() ? 2.0F : 1.0F;
+			this.dead = true;
+			this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), (float)this.explosionRadius * f, World.ExplosionSourceType.MOB);
+			this.discard();
+			this.spawnEffectsCloud();
+		}
+	}
+
+	@Override
 	public void tick() {
 		super.tick();
 		if (!this.getWorld().isClient) return;
 
-//		if (this.isGrazing()) {
-//			this.startGrazingState.startIfNotRunning(this.age);
-//			this.stopGrazingState.stop();
-//		} else {
-//			this.stopGrazingState.startIfNotRunning(this.age);
-//			this.startGrazingState.stop();
-//		}
+		if (this.isGrazing()) {
+			this.startGrazingState.startIfNotRunning(this.age);
+			this.stopGrazingState.stop();
+		} else {
+			this.stopGrazingState.startIfNotRunning(this.age);
+			this.startGrazingState.stop();
+		}
 //		this.wasGrazing = this.isGrazing();
 	}
 
@@ -201,7 +213,7 @@ public class SheeperEntity extends CreeperEntity implements HissingEntity {
 	}
 
 	public static DefaultAttributeContainer.Builder createMobAttributes() {
-		return CreeperEntity.createMobAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25);
+		return CreeperEntity.createMobAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15);
 	}
 
 }

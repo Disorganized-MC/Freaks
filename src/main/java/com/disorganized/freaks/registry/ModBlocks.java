@@ -2,10 +2,10 @@ package com.disorganized.freaks.registry;
 
 import com.disorganized.freaks.Freaks;
 import com.disorganized.freaks.content.block.SteelWoolBlock;
-import com.disorganized.freaks.mixin.FireBlockInvoker;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FireBlock;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.enums.Instrument;
 import net.minecraft.item.BlockItem;
@@ -17,7 +17,7 @@ import net.minecraft.sound.BlockSoundGroup;
 public class ModBlocks {
 
     public static void init() {
-		((FireBlockInvoker)Blocks.FIRE).invokeRegisterFlammableBlock(STEEL_WOOL, 15, 400);
+		((FireBlock)Blocks.FIRE).registerFlammableBlock(STEEL_WOOL, 15, 400);
 	}
 
     public static final Block STEEL_WOOL = register("steel_wool", new SteelWoolBlock(

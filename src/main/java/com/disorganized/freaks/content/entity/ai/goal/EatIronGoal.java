@@ -27,6 +27,7 @@ public class EatIronGoal extends Goal {
 
 	@Override
 	public boolean canStart() {
+		if (!this.entity.canGrowWool()) return false;
 		if (this.entity.getRandom().nextInt(GRAZING_CHANCE) != 0) return false;
 		BlockPos pos = this.entity.getSteppingPos();
 		return this.world.getBlockState(pos).isIn(ModBlockTags.SHEEPER_PASTURES);

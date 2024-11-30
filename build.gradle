@@ -7,6 +7,7 @@ version = mod_version
 group = maven_group
 
 loom {
+	accessWidenerPath = file("src/main/resources/freaks.accesswidener")
 	splitEnvironmentSourceSets()
 	mods {
 		"freaks" {

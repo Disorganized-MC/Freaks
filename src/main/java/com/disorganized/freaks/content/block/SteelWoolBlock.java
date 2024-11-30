@@ -1,6 +1,5 @@
 package com.disorganized.freaks.content.block;
 
-import com.disorganized.freaks.mixin.FireBlockInvoker;
 import com.disorganized.freaks.registry.ModDamageTypes;
 import com.disorganized.freaks.registry.ModSoundEvents;
 import net.minecraft.block.*;
@@ -92,6 +91,16 @@ public class SteelWoolBlock extends Block implements Ignitable {
 	public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
 		if (!state.get(LIT)) return;
 
+		if (random.nextInt(2) == 0) world.addParticle(
+			ParticleTypes.LAVA,
+			pos.getX() + random.nextDouble(),
+			pos.getY() + 1,
+			pos.getZ() + random.nextDouble(),
+			random.nextDouble(),
+			1,
+			random.nextDouble()
+		);
+
 		if (random.nextInt(24) == 0) world.playSound(
 			(double)pos.getX() + 0.5,
 			(double)pos.getY() + 0.5,
@@ -102,25 +111,17 @@ public class SteelWoolBlock extends Block implements Ignitable {
 			random.nextFloat() * 0.7F + 0.3F,
 			false
 		);
-
-		for (int i = 0; i < 3; ++i) world.addParticle(
-			ParticleTypes.LARGE_SMOKE,
-			(double)pos.getX() + random.nextDouble(),
-			(double)pos.getY() + random.nextDouble() * 0.5 + 0.5,
-			(double)pos.getZ() + random.nextDouble(),
-			0.0, 0.0, 0.0
-		);
 	}
 
 	@Override
 	public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
 		super.onBlockAdded(state, world, pos, oldState, notify);
-		world.scheduleBlockTick(pos, this, FireBlockInvoker.invokeGetFireTickDelay(world.random));
+		world.scheduleBlockTick(pos, this, FireBlock.getFireTickDelay(world.random));
 	}
 
 	@Override
 	public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		world.scheduleBlockTick(pos, this, FireBlockInvoker.invokeGetFireTickDelay(world.random));
+		world.scheduleBlockTick(pos, this, FireBlock.getFireTickDelay(world.random));
 		if (!state.get(LIT)) return;
 		if (!world.getGameRules().getBoolean(GameRules.DO_FIRE_TICK)) return;
 
@@ -128,11 +129,12 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		List<BlockPos> neighbours = getNeighbours(pos);
 		for (BlockPos nPos : neighbours) {
 			this.trySpreadingFire(world, nPos, 300 + spreadChance, random);
+			this.trySettingFire(world, nPos, spreadChance, random);
 		}
 	}
 
 	private void trySpreadingFire(World world, BlockPos pos, int spreadFactor, Random random) {
-		int spreadChance = ((FireBlockInvoker)Blocks.FIRE).invokeGetSpreadChance(world.getBlockState(pos));
+		int spreadChance = ((FireBlock)Blocks.FIRE).getSpreadChance(world.getBlockState(pos));
 		if (random.nextInt(spreadFactor) >= spreadChance) return;
 
 		if (random.nextInt(10) < 5 && !world.hasRain(pos)) {
@@ -140,7 +142,22 @@ public class SteelWoolBlock extends Block implements Ignitable {
 			if (state.getBlock() instanceof Ignitable block) {
 				if (!block.onIgnited(world, pos)) return;
 			}
+			System.out.println("test");
 			world.setBlockState(pos, Blocks.FIRE.getDefaultState(), 3);
+		}
+	}
+
+	private void trySettingFire(World world, BlockPos pos, int spreadFactor, Random random) {
+		if (world.hasRain(pos)) return;
+
+		int burnChance = ((FireBlock)Blocks.FIRE).getBurnChance(world, pos);
+		if (burnChance <= 0) return;
+
+		burnChance = (burnChance + 40 + world.getDifficulty().getId() * 10) / 30;
+		if (world.getBiome(pos).isIn(BiomeTags.INCREASED_FIRE_BURNOUT)) burnChance /= 2;
+
+		if (random.nextInt(100) <= burnChance) {
+			world.setBlockState(pos, Blocks.FIRE.getDefaultState());
 		}
 	}
 
@@ -186,14 +203,14 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		world.syncWorldEvent(null, 3004, pos, 0);
 	}
 
-//    public void scrubState(World world, BlockState state, BlockPos pos, boolean lit) {
+//    public void scrubState(World world, BlockState state, BlockPos blockPos, boolean lit) {
 //        Optional<BlockState> scrubbedState = Oxidizable.getDecreasedOxidationState(state);
 //        if (scrubbedState.isEmpty()) return;
 //
-//        world.setBlockState(pos, scrubbedState.get());
-//        world.playSound(null, pos, ModSoundEvents.BLOCK_STEEL_WOOL_SCRUB, SoundCategory.BLOCKS, 1.0F, 1.0F);
+//        world.setBlockState(blockPos, scrubbedState.get());
+//        world.playSound(null, blockPos, ModSoundEvents.BLOCK_STEEL_WOOL_SCRUB, SoundCategory.BLOCKS, 1.0F, 1.0F);
 //		// i hate these magic bullshit methods
-//		world.syncWorldEvent(null, 3004, pos, 0);
+//		world.syncWorldEvent(null, 3004, blockPos, 0);
 //	}
 
 	// TODO make this actually work i give up for now

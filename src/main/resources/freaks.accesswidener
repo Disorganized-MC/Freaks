@@ -1,0 +1,10 @@
+accessWidener v2 named
+
+accessible method net/minecraft/block/FireBlock registerFlammableBlock (Lnet/minecraft/block/Block;II)V
+accessible method net/minecraft/block/FireBlock getFireTickDelay (Lnet/minecraft/util/math/random/Random;)I
+accessible method net/minecraft/block/FireBlock getSpreadChance (Lnet/minecraft/block/BlockState;)I
+accessible method net/minecraft/block/FireBlock getBurnChance (Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)I
+
+accessible field net/minecraft/entity/mob/CreeperEntity explosionRadius I
+extendable method net/minecraft/entity/mob/CreeperEntity explode ()V
+accessible method net/minecraft/entity/mob/CreeperEntity spawnEffectsCloud ()V
