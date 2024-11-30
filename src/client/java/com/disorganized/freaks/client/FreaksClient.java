@@ -15,7 +15,7 @@ public class FreaksClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ModEntityRenderers.init();
-		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutoutMipped(),
+		BlockRenderLayerMap.INSTANCE.putBlocks(RenderLayer.getCutout(),
 			ModBlocks.STEEL_WOOL
 		);
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content ->

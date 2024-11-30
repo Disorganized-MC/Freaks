@@ -25,6 +25,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
@@ -91,14 +94,29 @@ public class SteelWoolBlock extends Block implements Ignitable {
 	public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
 		if (!state.get(LIT)) return;
 
+		if (random.nextInt(2) == 0) {
+			Direction direction = Direction.random(random);
+			int multiplier = direction.getId() % 2 == 0 ? -1 : 1;
+			Vec3d offset = Vec3d.of(direction.getVector()).multiply(0.6);
+			offset = new Vec3d(
+				MathHelper.clamp(offset.x + (random.nextDouble() * multiplier), -0.6, 0.6),
+				MathHelper.clamp(offset.y + (random.nextDouble() * multiplier), -0.6, 0.6),
+				MathHelper.clamp(offset.z + (random.nextDouble() * multiplier), -0.6, 0.6)
+			);
+			Vec3d newPos = Vec3d.of(pos).add(0.5, 0.5, 0.5);
+			newPos = newPos.add(offset.x, offset.y, offset.z);
+
+			world.addParticle(
+				ParticleTypes.FLAME,
+				newPos.x, newPos.y, newPos.z,
+				0, 0, 0
+			);
+		}
+
 		if (random.nextInt(2) == 0) world.addParticle(
 			ParticleTypes.LAVA,
-			pos.getX() + random.nextDouble(),
-			pos.getY() + 1,
-			pos.getZ() + random.nextDouble(),
-			random.nextDouble(),
-			1,
-			random.nextDouble()
+			pos.getX() + 0.5, pos.getY() + 0.25, pos.getZ() + 0.5,
+			random.nextDouble(), random.nextDouble() + 1, random.nextDouble()
 		);
 
 		if (random.nextInt(24) == 0) world.playSound(
@@ -174,14 +192,7 @@ public class SteelWoolBlock extends Block implements Ignitable {
     }
 
 	public List<BlockPos> getNeighbours(BlockPos pos) {
-		return List.of(
-			pos.up(),
-			pos.down(),
-			pos.north(),
-			pos.south(),
-			pos.east(),
-			pos.west()
-		);
+		return List.of(pos.up(), pos.down(), pos.north(), pos.south(), pos.east(), pos.west());
 	}
 
 	public void scrubState(World world, BlockState state, BlockPos pos, boolean lit) {
