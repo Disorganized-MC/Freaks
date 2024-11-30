@@ -4,6 +4,7 @@ accessible method net/minecraft/block/FireBlock registerFlammableBlock (Lnet/min
 accessible method net/minecraft/block/FireBlock getFireTickDelay (Lnet/minecraft/util/math/random/Random;)I
 accessible method net/minecraft/block/FireBlock getSpreadChance (Lnet/minecraft/block/BlockState;)I
 accessible method net/minecraft/block/FireBlock getBurnChance (Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)I
+accessible method net/minecraft/block/FireBlock getStateForPosition (Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;
 
 accessible field net/minecraft/entity/mob/CreeperEntity explosionRadius I
 extendable method net/minecraft/entity/mob/CreeperEntity explode ()V

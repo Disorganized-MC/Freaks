@@ -161,7 +161,7 @@ public class SteelWoolBlock extends Block implements Ignitable {
 				if (!block.onIgnited(world, pos)) return;
 			}
 			System.out.println("test");
-			world.setBlockState(pos, Blocks.FIRE.getDefaultState(), 3);
+			world.setBlockState(pos, ((FireBlock) Blocks.FIRE).getStateForPosition(world, pos), 3);
 		}
 	}
 
@@ -175,7 +175,7 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		if (world.getBiome(pos).isIn(BiomeTags.INCREASED_FIRE_BURNOUT)) burnChance /= 2;
 
 		if (random.nextInt(100) <= burnChance) {
-			world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+			world.setBlockState(pos, ((FireBlock) Blocks.FIRE).getStateForPosition(world, pos), 3);
 		}
 	}
 
