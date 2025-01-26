@@ -1,0 +1,10 @@
+{
+	"variants": {
+		"hydrated=false": {
+			"model": "freaks:block/living_muck/dry"
+		},
+		"hydrated=true": {
+			"model": "freaks:block/living_muck/hydrated"
+		}
+	}
+}

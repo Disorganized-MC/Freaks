@@ -18,6 +18,15 @@ public class ModItems {
 		Color.decode("#3d3f4e").getRGB(),
 		new Item.Settings()
 	));
+	public static final Item MUCK_SPAWN_EGG = register("muck_spawn_egg", new SpawnEggItem(
+		ModEntityTypes.MUCK,
+		Color.decode("#2b2013").getRGB(),
+		Color.decode("#3c5420").getRGB(),
+		new Item.Settings()
+	));
+	public static final Item MUCK_BALL = register("muck_ball", new Item(
+		new Item.Settings()
+	));
 
 	private static Item register(String path, Item item) {
 		return Registry.register(Registries.ITEM, Freaks.of(path), item);

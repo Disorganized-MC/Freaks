@@ -1,6 +1,7 @@
 package com.disorganized.freaks.registry;
 
 import com.disorganized.freaks.Freaks;
+import com.disorganized.freaks.content.block.LivingMuckBlock;
 import com.disorganized.freaks.content.block.SteelWoolBlock;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
@@ -21,14 +22,19 @@ public class ModBlocks {
 	}
 
     public static final Block STEEL_WOOL = register("steel_wool", new SteelWoolBlock(
-            FabricBlockSettings.create()
-                    .mapColor(MapColor.GRAY)
-                    .instrument(Instrument.GUITAR)
-                    .strength(1.6F)
-                    .sounds(BlockSoundGroup.WOOL)
-                    .luminance(SteelWoolBlock::getLuminance)
-                    .burnable()
+		FabricBlockSettings.create()
+			.mapColor(MapColor.GRAY)
+			.instrument(Instrument.GUITAR)
+			.strength(1.6F)
+			.sounds(BlockSoundGroup.WOOL)
+			.luminance(SteelWoolBlock::getLuminance)
+			.burnable()
     ));
+	public static final Block LIVING_MUCK = register("living_muck", new LivingMuckBlock(
+		FabricBlockSettings.create()
+			.mapColor(MapColor.BROWN)
+			.sounds(BlockSoundGroup.MUD)
+	));
 
     private static Block register(String path, Block block) {
         Registry.register(Registries.BLOCK, Freaks.of(path), block);

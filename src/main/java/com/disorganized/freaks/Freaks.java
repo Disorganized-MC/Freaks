@@ -26,6 +26,7 @@ public class Freaks implements ModInitializer {
 		ModDamageTypes.init();
 		ModSoundEvents.init();
 		ModEntityTypes.init();
+		ModParticleTypes.init();
 		LOGGER.info("Initialized!");
 	}
 

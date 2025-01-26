@@ -1,6 +1,6 @@
 package com.disorganized.freaks.content.entity.ai.goal;
 
-import com.disorganized.freaks.content.entity.SheeperEntity;
+import com.disorganized.freaks.content.entity.AbstractSheeperEntity;
 import com.disorganized.freaks.registry.ModBlockTags;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
@@ -14,11 +14,11 @@ public class EatIronGoal extends Goal {
 	private static final int MAX_TIMER = 100;
 	private static final int GRAZING_CHANCE = 25;
 
-	private final SheeperEntity entity;
+	private final AbstractSheeperEntity entity;
 	private final World world;
 	private final AtomicInteger timer;
 
-	public EatIronGoal(SheeperEntity entity) {
+	public EatIronGoal(AbstractSheeperEntity entity) {
 		this.entity = entity;
 		this.world = entity.getWorld();
 		this.timer = new AtomicInteger(0);

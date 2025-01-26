@@ -1,7 +1,9 @@
 {
 	"item.freaks.sheeper_spawn_egg": "Sheeper Spawn Egg",
+	"item.freaks.muck_spawn_egg": "Muck Spawn Egg",
 
 	"block.freaks.steel_wool": "Steel Wool",
+	"block.freaks.living_muck": "Living Muck",
 
 	"subtitles.block.freaks.steel_wool.scrub": "Steel Wool scrubs",
 	"subtitles.entity.freaks.sheeper.ambient": "Sheeper baahs..?",

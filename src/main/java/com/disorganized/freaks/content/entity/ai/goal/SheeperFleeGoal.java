@@ -1,6 +1,7 @@
 package com.disorganized.freaks.content.entity.ai.goal;
 
-import com.disorganized.freaks.content.entity.SheeperEntity;
+import com.disorganized.freaks.content.entity.AbstractSheeperEntity;
+import com.disorganized.freaks.content.entity.AbstractSheeperEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class SheeperFleeGoal<T extends LivingEntity> extends Goal {
 
-	protected final SheeperEntity entity;
+	protected final AbstractSheeperEntity entity;
 	protected final Class<T> targetType;
 	protected final EntityNavigation navigation;
 	protected final float fleeDistance;
@@ -24,7 +25,7 @@ public class SheeperFleeGoal<T extends LivingEntity> extends Goal {
 	@Nullable protected T target;
 	@Nullable protected Path fleePath;
 
-	public SheeperFleeGoal(SheeperEntity entity, Class<T> targetType, float distance) {
+	public SheeperFleeGoal(AbstractSheeperEntity entity, Class<T> targetType, float distance) {
 		this.entity = entity;
 		this.targetType = targetType;
 		this.navigation = entity.getNavigation();

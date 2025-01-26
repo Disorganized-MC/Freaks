@@ -7,6 +7,8 @@
 	},
 	"mixins": [
 		"CreeperEntityMixin",
+		"ExplosionMixin",
+		"FallingBlockEntityMixin",
 		"FireBlockMixin",
 		"TntBlockMixin"
 	]

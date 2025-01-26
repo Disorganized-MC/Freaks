@@ -1,11 +1,23 @@
 accessWidener v2 named
 
+# Steel Wool
 accessible method net/minecraft/block/FireBlock registerFlammableBlock (Lnet/minecraft/block/Block;II)V
 accessible method net/minecraft/block/FireBlock getFireTickDelay (Lnet/minecraft/util/math/random/Random;)I
 accessible method net/minecraft/block/FireBlock getSpreadChance (Lnet/minecraft/block/BlockState;)I
 accessible method net/minecraft/block/FireBlock getBurnChance (Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)I
 accessible method net/minecraft/block/FireBlock getStateForPosition (Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;
 
+# Sheeper
 accessible field net/minecraft/entity/mob/CreeperEntity explosionRadius I
 extendable method net/minecraft/entity/mob/CreeperEntity explode ()V
 accessible method net/minecraft/entity/mob/CreeperEntity spawnEffectsCloud ()V
+accessible field net/minecraft/entity/mob/CreeperEntity fuseTime I
+
+# Muck
+accessible class net/minecraft/entity/mob/SlimeEntity$SlimeMoveControl
+accessible method net/minecraft/client/particle/CrackParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/item/ItemStack;)V
+
+# Living Muck
+accessible field net/minecraft/entity/FallingBlockEntity block Lnet/minecraft/block/BlockState;
+accessible method net/minecraft/entity/FallingBlockEntity <init> (Lnet/minecraft/world/World;DDDLnet/minecraft/block/BlockState;)V
+accessible method net/minecraft/block/FarmlandBlock isWaterNearby (Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)Z

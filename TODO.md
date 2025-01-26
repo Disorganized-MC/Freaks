@@ -1,0 +1,17 @@
+# Muck
+- ~~Spawns when it's raining~~ (spawn weight should prolly be increased)
+- ~~Jumps around like a slime but faster~~
+- If aggroed to a player, stands still and shoots bursts of mud bubbles, tries to stay away if pursued.
+- Mud bubbles slowly home towards their target and will pop if punched or hit with a projectile.
+- if the player gets close enough to the muck, it'll switch to melee combat.
+- ~~The muck takes extra knockback from attacks.~~ (configurable in the code)
+- ~~When the muck dies it becomes a falling muck block entity, that gets knocked back even harder than the muck would.~~
+- It should probably be a custom entity and not a normal falling block because falling blocks have a tendency to implode when they land on a flower etc. The muck block entity should be able to place a block when it touches the ground as a falling block entity would, but it also should bounce and/or slide around if it doesn't find a proper spot to place the block, killing itself and dropping the muck's loot if it can't find a spot for too long.
+- ~~the falling muck block entity places a muck block~~
+- ~~the muck block gets hydrated by rain, water, wet sponges etc. like farmland~~
+- ~~a hydrated muck block will turn back into a muck if not broken in time~~
+- a dry muck block will decay and drop no loot
+- the muck block should drop the muck's loot when broken
+- the muck itself should drop no loot on death, as that's when it turns into the falling muck block entity
+- the muck should be able to take damage and die from dehydration like a dolphin, dropping no loot and leaving no block behind if such a thing happens
+- rare ~~2x2 and 3x3 variants of the muck that have more hp and deal more damage~~ and explode into 8 and 27 falling muck blocks respectively
