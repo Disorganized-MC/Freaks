@@ -1,6 +1,6 @@
 {
-	"parent": "minecraft:block/cube_all",
-	"textures": {
-		"all": "freaks:block/steel_wool/flaming"
-	}
+  "parent": "freaks:block/steel_wool/default",
+  "textures": {
+    "0": "freaks:block/steel_wool/flaming"
+  }
 }
