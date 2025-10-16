@@ -3,12 +3,8 @@ package com.disorganized.freaks.registry;
 import com.disorganized.freaks.Freaks;
 import com.disorganized.freaks.content.block.LivingMuckBlock;
 import com.disorganized.freaks.content.block.SteelWoolBlock;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FireBlock;
-import net.minecraft.block.MapColor;
-import net.minecraft.block.enums.Instrument;
+import net.minecraft.block.*;
+import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -22,16 +18,16 @@ public class ModBlocks {
 	}
 
     public static final Block STEEL_WOOL = register("steel_wool", new SteelWoolBlock(
-		FabricBlockSettings.create()
+		AbstractBlock.Settings.create()
 			.mapColor(MapColor.GRAY)
-			.instrument(Instrument.GUITAR)
+			.instrument(NoteBlockInstrument.GUITAR)
 			.strength(1.6F)
 			.sounds(BlockSoundGroup.WOOL)
 			.luminance(SteelWoolBlock::getLuminance)
 			.burnable()
     ));
 	public static final Block LIVING_MUCK = register("living_muck", new LivingMuckBlock(
-		FabricBlockSettings.create()
+		AbstractBlock.Settings.create()
 			.mapColor(MapColor.BROWN)
 			.sounds(BlockSoundGroup.MUD)
 	));

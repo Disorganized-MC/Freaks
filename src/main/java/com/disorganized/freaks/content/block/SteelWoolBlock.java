@@ -67,28 +67,25 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		return !world.removeBlock(pos, false);
 	}
 
-
-
-
-    @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack stack = player.getStackInHand(hand);
-        if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE) || state.get(LIT))
-            return super.onUse(state, world, pos, player, hand, hit);
-
-        this.onIgnited(world, pos);
-        Item item = stack.getItem();
-        if (!player.isCreative()) {
-            if (stack.isOf(Items.FLINT_AND_STEEL)) {
-                stack.damage(1, player, playerx -> playerx.sendToolBreakStatus(hand));
-            } else {
-                stack.decrement(1);
-            }
-        }
-
-        player.incrementStat(Stats.USED.getOrCreateStat(item));
-        return ActionResult.success(world.isClient);
-    }
+//    @Override
+//    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+//        ItemStack stack = player.getStackInHand(hand);
+//        if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE) || state.get(LIT))
+//            return super.onUse(state, world, pos, player, hand, hit);
+//
+//        this.onIgnited(world, pos);
+//        Item item = stack.getItem();
+//        if (!player.isCreative()) {
+//            if (stack.isOf(Items.FLINT_AND_STEEL)) {
+//                stack.damage(1, player, playerx -> playerx.sendToolBreakStatus(hand));
+//            } else {
+//                stack.decrement(1);
+//            }
+//        }
+//
+//        player.incrementStat(Stats.USED.getOrCreateStat(item));
+//        return ActionResult.success(world.isClient);
+//    }
 
 	@Override
 	public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {

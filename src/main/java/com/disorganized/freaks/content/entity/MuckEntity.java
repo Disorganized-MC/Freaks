@@ -3,6 +3,7 @@ package com.disorganized.freaks.content.entity;
 import com.disorganized.freaks.registry.ModBlocks;
 import com.disorganized.freaks.registry.ModParticleTypes;
 import net.minecraft.block.Block;
+import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.entity.*;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.tag.BiomeTags;
@@ -43,6 +44,16 @@ public class MuckEntity extends AbstractMuckEntity {
 			return canMobSpawn(type, world, reason, pos, random);
 		}
 		return false;
+	}
+
+	@Override
+	public void setComponents(ComponentMapImpl components) {
+
+	}
+
+	@Override
+	public ComponentMapImpl getMutableComponents() {
+		return null;
 	}
 
 }

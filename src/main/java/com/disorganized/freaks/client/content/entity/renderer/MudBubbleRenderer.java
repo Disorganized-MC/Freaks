@@ -16,7 +16,7 @@ import org.joml.*;
 
 public class MudBubbleRenderer extends EntityRenderer<MudBubbleEntity> {
 
-	private static final Identifier TEXTURE = Freaks.of("textures/particle/mud_bubble/still.png");
+	private static final Identifier TEXTURE = Freaks.of("textures/entity/projectile/mud_bubble/still.png");
 
 	public MudBubbleRenderer(EntityRendererFactory.Context ctx) {
 		super(ctx);
@@ -53,13 +53,13 @@ public class MudBubbleRenderer extends EntityRenderer<MudBubbleEntity> {
 		int textureU,
 		int textureV
 	) {
-		vertexConsumer.vertex(modelMatrix, x - 0.5f, (float) y - 0.25f, 0.0f)
-			.color(255, 255, 255, 255)
-			.texture(textureU, textureV)
-			.overlay(OverlayTexture.DEFAULT_UV)
-			.light(light)
-			.normal(normalMatrix, 0.0f, 1.0f, 0.0f)
-			.next();
+//		vertexConsumer.vertex(modelMatrix, x - 0.5f, (float) y - 0.25f, 0.0f)
+//			.color(255, 255, 255, 255)
+//			.texture(textureU, textureV)
+//			.overlay(OverlayTexture.DEFAULT_UV)
+//			.light(light)
+//			.normal(normalMatrix, 0.0f, 1.0f, 0.0f)
+//			.next();
 	}
 
 	private RenderLayer getLayer(MudBubbleEntity entity) {

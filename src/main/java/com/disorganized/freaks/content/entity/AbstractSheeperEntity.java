@@ -53,13 +53,13 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		super(entityType, world);
 	}
 
-	@Override
-	protected void initDataTracker() {
-		super.initDataTracker();
-		this.dataTracker.startTracking(WOOL_LAYERS, MAX_WOOL_LAYERS);
-		this.dataTracker.startTracking(GRAZING, false);
-		this.explosionRadius = 9;
-	}
+//	@Override
+//	protected void initDataTracker() {
+//		super.initDataTracker();
+//		this.dataTracker.startTracking(WOOL_LAYERS, MAX_WOOL_LAYERS);
+//		this.dataTracker.startTracking(GRAZING, false);
+//		this.explosionRadius = 9;
+//	}
 
 	@Override
 	protected void initGoals() {
@@ -159,7 +159,7 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		if (!this.getWorld().isClient && this.isShearable()) {
 			this.sheared();
 			this.emitGameEvent(GameEvent.SHEAR, player);
-			stack.damage(1, player, cPlayer -> cPlayer.sendToolBreakStatus(hand));
+			stack.damage(1, player, getSlotForHand(hand));
 			return ActionResult.SUCCESS;
 		} else {
 			return ActionResult.CONSUME;
@@ -171,7 +171,8 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		this.removeWoolLayer();
 
 		ServerWorld world = (ServerWorld)this.getWorld();
-		LootTable table = world.getServer().getLootManager().getLootTable(ModLootTables.SHEEPER_SHEARED);
+
+		LootTable table = world.getServer().getReloadableRegistries().getLootTable(ModLootTables.SHEEPER_SHEARED);
 		LootContextParameterSet lootContextParameterSet = new LootContextParameterSet.Builder(world)
 			.add(LootContextParameters.ORIGIN, this.getPos())
 			.add(LootContextParameters.THIS_ENTITY, this)

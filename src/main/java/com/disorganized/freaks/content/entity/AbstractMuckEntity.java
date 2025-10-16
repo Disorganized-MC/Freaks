@@ -31,11 +31,7 @@ public abstract class AbstractMuckEntity extends SlimeEntity {
 		if (this.getWorld().isClient) return;
 		if (!this.isDead()) return;
 
-		Vec3d pos = this.getPos();
-		System.out.println(pos);
 		FallingBlockEntity fallingBlock = FallingBlockEntity.spawnFromBlock(this.getWorld(), this.getBlockPos(), this.getLivingBlock().getDefaultState());
-//		FallingBlockEntity fallingBlock = new FallingBlockEntity(this.getWorld(), pos.x, pos.y + 3, pos.z, ModBlocks.LIVING_MUCK.getDefaultState());
-		System.out.println(fallingBlock);
 		((SturdyFallingBlockEntity)fallingBlock).setSturdy(true);
 		fallingBlock.setVelocity(this.getVelocity().multiply(1.5));
 		fallingBlock.velocityModified = true;
@@ -57,7 +53,7 @@ public abstract class AbstractMuckEntity extends SlimeEntity {
 	}
 
 	@Override
-	public EntityDimensions getDimensions(EntityPose pose) {
+	public EntityDimensions getBaseDimensions(EntityPose pose) {
 		return EntityDimensions.fixed(this.getSize(), this.getSize()).scaled(this.getSize());
 	}
 

@@ -6,9 +6,9 @@ import net.minecraft.client.particle.ParticleFactory;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.particle.DefaultParticleType;
+import net.minecraft.particle.SimpleParticleType;
 
-public class ItemStackParticleFactory implements ParticleFactory<DefaultParticleType> {
+public class ItemStackParticleFactory implements ParticleFactory<SimpleParticleType> {
 
 	private final ItemStack stack;
 
@@ -17,7 +17,7 @@ public class ItemStackParticleFactory implements ParticleFactory<DefaultParticle
 	}
 
 	@Override
-	public Particle createParticle(DefaultParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
+	public Particle createParticle(SimpleParticleType defaultParticleType, ClientWorld clientWorld, double d, double e, double f, double g, double h, double i) {
 		return new CrackParticle(clientWorld, d, e, f, this.stack);
 	}
 
