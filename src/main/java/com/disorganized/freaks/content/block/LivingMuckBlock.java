@@ -45,7 +45,6 @@ public class LivingMuckBlock extends Block {
 	}
 
 	public void tryFormingMuck(ServerWorld world, BlockPos pos) {
-		System.out.println("test");
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		MuckEntity entity = ModEntityTypes.MUCK.create(world);
 		if (entity == null) return;

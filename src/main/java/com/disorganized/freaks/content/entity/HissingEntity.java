@@ -5,6 +5,7 @@ import net.minecraft.sound.SoundEvent;
 public interface HissingEntity {
 
 	int getFuseTime();
+
 	SoundEvent getPrimedSound();
 
 }

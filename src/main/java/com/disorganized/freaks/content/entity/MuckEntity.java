@@ -46,14 +46,4 @@ public class MuckEntity extends AbstractMuckEntity {
 		return false;
 	}
 
-	@Override
-	public void setComponents(ComponentMapImpl components) {
-
-	}
-
-	@Override
-	public ComponentMapImpl getMutableComponents() {
-		return null;
-	}
-
 }

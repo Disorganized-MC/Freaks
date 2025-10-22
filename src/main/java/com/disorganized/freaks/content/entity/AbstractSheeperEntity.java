@@ -1,13 +1,15 @@
 package com.disorganized.freaks.content.entity;
 
+import com.disorganized.freaks.access.FreaksExplosion;
 import com.disorganized.freaks.content.entity.ai.goal.EatIronGoal;
 import com.disorganized.freaks.content.entity.ai.goal.SheeperFleeGoal;
-import com.disorganized.freaks.content.misc.ExplosionCollection;
 import com.disorganized.freaks.registry.ModLootTables;
 import com.disorganized.freaks.registry.ModSoundEvents;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.Shearable;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.SwimGoal;
@@ -30,36 +32,44 @@ import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.Explosion;
 
-import java.util.List;
-
-public abstract class AbstractSheeperEntity  extends CreeperEntity implements HissingEntity  {
+public abstract class AbstractSheeperEntity  extends CreeperEntity implements HissingEntity, Shearable {
 
 	public final AnimationState startGrazingState = new AnimationState();
 	public final AnimationState stopGrazingState = new AnimationState();
 
 	private static final int MAX_WOOL_LAYERS = 4;
 
-	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
-	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(SheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
+	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 	public AbstractSheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
 		super(entityType, world);
 	}
 
-//	@Override
-//	protected void initDataTracker() {
-//		super.initDataTracker();
-//		this.dataTracker.startTracking(WOOL_LAYERS, MAX_WOOL_LAYERS);
-//		this.dataTracker.startTracking(GRAZING, false);
-//		this.explosionRadius = 9;
-//	}
+	@Override
+	protected void initDataTracker(DataTracker.Builder builder) {
+		super.initDataTracker(builder);
+		builder.add(WOOL_LAYERS, MAX_WOOL_LAYERS);
+		builder.add(GRAZING, false);
+		this.explosionRadius = 9;
+	}
+
+	@Override
+	public ComponentMapImpl getMutableComponents() {
+		return new ComponentMapImpl(ComponentMap.EMPTY);
+	}
+
+	@Override
+	public void setComponents(ComponentMapImpl components) {
+
+	}
 
 	@Override
 	protected void initGoals() {
@@ -93,6 +103,7 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		return getWoolLayers() <= MAX_WOOL_LAYERS;
 	}
 
+	@Override
 	public boolean isShearable() {
 		return this.isAlive() && this.getWoolLayers() > 0 && !this.isOnFire();
 	}
@@ -117,7 +128,6 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		this.setWoolLayers(nbt.getInt("wool_layers"));
 	}
 
-
 	@Override
 	public void explode() {
 		if (this.getWorld().isClient) return;
@@ -125,7 +135,7 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		float multiplier = this.shouldRenderOverlay() ? 2.0F : 1.0F;
 		this.dead = true;
 		Explosion explosion = this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), (float)this.explosionRadius * multiplier, true, World.ExplosionSourceType.NONE);
-		((ExplosionCollection)explosion).getAffectedEntities().forEach(entity -> entity.setFireTicks(60));
+		((FreaksExplosion)explosion).getAffectedEntities().forEach(entity -> entity.setFireTicks(60));
 		this.discard();
 		this.spawnEffectsCloud();
 	}
@@ -142,7 +152,6 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 			this.stopGrazingState.startIfNotRunning(this.age);
 			this.startGrazingState.stop();
 		}
-//		this.wasGrazing = this.isGrazing();
 	}
 
 	@Override
@@ -151,45 +160,34 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		this.addWoolLayer();
 	}
 
-	@Override
-	public ActionResult interactMob(PlayerEntity player, Hand hand) {
+	protected ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getStackInHand(hand);
-		if (!stack.isOf(Items.SHEARS)) return super.interactMob(player, hand);
+		if (!this.isShearable() || !stack.isOf(Items.SHEARS)) return super.interactMob(player, hand);
 
-		if (!this.getWorld().isClient && this.isShearable()) {
-			this.sheared();
-			this.emitGameEvent(GameEvent.SHEAR, player);
-			stack.damage(1, player, getSlotForHand(hand));
-			return ActionResult.SUCCESS;
-		} else {
-			return ActionResult.CONSUME;
-		}
+		this.sheared(SoundCategory.PLAYERS);
+		this.emitGameEvent(GameEvent.SHEAR, player);
+		if (!this.getWorld().isClient) stack.damage(1, player, getSlotForHand(hand));
+
+		return ActionResult.success(this.getWorld().isClient);
 	}
 
-	public void sheared() {
-		this.getWorld().playSoundFromEntity(null, this, ModSoundEvents.ENTITY_SHEEPER_SHEAR, SoundCategory.PLAYERS, 1.0F, 1.0F);
+	@Override
+	public void sheared(SoundCategory category) {
+		this.getWorld().playSoundFromEntity(null, this, ModSoundEvents.ENTITY_SHEEPER_SHEAR, category, 1.0F, 1.0F);
+		this.dropShearedItems();
 		this.removeWoolLayer();
+	}
 
-		ServerWorld world = (ServerWorld)this.getWorld();
+	public void dropShearedItems() {
+		if (this.getWorld().isClient) return;
+		ServerWorld world = (ServerWorld) this.getWorld();
 
-		LootTable table = world.getServer().getReloadableRegistries().getLootTable(ModLootTables.SHEEPER_SHEARED);
-		LootContextParameterSet lootContextParameterSet = new LootContextParameterSet.Builder(world)
+		LootTable table = world.getServer().getReloadableRegistries().getLootTable(ModLootTables.SHEEPER_SHEARING);
+		LootContextParameterSet parameters = new LootContextParameterSet.Builder(world)
 			.add(LootContextParameters.ORIGIN, this.getPos())
 			.add(LootContextParameters.THIS_ENTITY, this)
-			.build(LootContextTypes.GIFT);
-		List<ItemStack> items = table.generateLoot(lootContextParameterSet);
-		for (ItemStack droppedStack : items) {
-			ItemEntity itemEntity = this.dropStack(droppedStack, 1);
-			if (itemEntity != null) {
-				Vec3d velocity = itemEntity.getVelocity();
-				velocity = velocity.add(
-					(this.random.nextFloat() - this.random.nextFloat()) * 0.1F,
-					this.random.nextFloat() * 0.05F,
-					(this.random.nextFloat() - this.random.nextFloat()) * 0.1F
-				);
-				itemEntity.setVelocity(velocity);
-			}
-		}
+			.build(LootContextTypes.SHEARING);
+		table.generateLoot(parameters).forEach(stack -> this.dropStack(stack, this.getHeight()));
 	}
 
 	@Override

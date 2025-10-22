@@ -50,7 +50,6 @@ public abstract class FallingBlockEntityMixin extends Entity implements SturdyFa
 
 	@ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;canPlaceAt(Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)Z"))
 	private boolean sturdyCanPlaceAt(boolean canPlaceAt, @Local BlockState state) {
-		System.out.println(state.getPistonBehavior());
 		if (this.isSturdy()) {
 			if (state.isReplaceable()) return true;
 			return switch (state.getPistonBehavior()) {

@@ -2,6 +2,8 @@ package com.disorganized.freaks.content.entity;
 
 import com.disorganized.freaks.content.entity.ai.goal.ShootMudBubblesGoal;
 import net.minecraft.block.Block;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.entity.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.damage.DamageSource;
@@ -18,10 +20,24 @@ public abstract class AbstractMuckEntity extends SlimeEntity {
 		super(type, world);
 	}
 
+	@Override
+	public void setComponents(ComponentMapImpl components) {
+
+	}
+
+	@Override
+	public ComponentMapImpl getMutableComponents() {
+		return new ComponentMapImpl(ComponentMap.EMPTY);
+	}
+
 	protected void initGoals() {
+		this.goalSelector.add(1, new SwimmingGoal(this));
+		this.goalSelector.add(2, new FaceTowardTargetGoal(this));
+		this.goalSelector.add(3, new RandomLookGoal(this));
+		this.goalSelector.add(5, new MoveGoal(this));
+
 		this.targetSelector.add(1, new ShootMudBubblesGoal<>(this, PlayerEntity.class, 10, true, false, player -> Math.abs(player.getY() - this.getY()) <= 4.0));
 		this.targetSelector.add(3, new ShootMudBubblesGoal<>(this, IronGolemEntity.class, true));
-		super.initGoals();
 	}
 
 	@Override

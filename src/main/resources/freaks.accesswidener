@@ -15,6 +15,10 @@ accessible field net/minecraft/entity/mob/CreeperEntity fuseTime I
 
 # Muck
 accessible class net/minecraft/entity/mob/SlimeEntity$SlimeMoveControl
+accessible class net/minecraft/entity/mob/SlimeEntity$SwimmingGoal
+accessible class net/minecraft/entity/mob/SlimeEntity$FaceTowardTargetGoal
+accessible class net/minecraft/entity/mob/SlimeEntity$RandomLookGoal
+accessible class net/minecraft/entity/mob/SlimeEntity$MoveGoal
 accessible method net/minecraft/client/particle/CrackParticle <init> (Lnet/minecraft/client/world/ClientWorld;DDDLnet/minecraft/item/ItemStack;)V
 
 # Living Muck

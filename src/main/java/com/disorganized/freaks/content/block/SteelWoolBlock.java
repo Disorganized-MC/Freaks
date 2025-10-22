@@ -4,6 +4,7 @@ import com.disorganized.freaks.registry.ModDamageTypes;
 import com.disorganized.freaks.registry.ModSoundEvents;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,6 +24,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -50,7 +52,7 @@ public class SteelWoolBlock extends Block implements Ignitable {
     }
 
     public static int getLuminance(BlockState state) {
-        return state.get(LIT) ? 4 : 0;
+        return state.get(LIT) ? 15 : 0;
     }
 
 	@Override
@@ -67,25 +69,24 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		return !world.removeBlock(pos, false);
 	}
 
-//    @Override
-//    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-//        ItemStack stack = player.getStackInHand(hand);
-//        if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE) || state.get(LIT))
-//            return super.onUse(state, world, pos, player, hand, hit);
-//
-//        this.onIgnited(world, pos);
-//        Item item = stack.getItem();
-//        if (!player.isCreative()) {
-//            if (stack.isOf(Items.FLINT_AND_STEEL)) {
-//                stack.damage(1, player, playerx -> playerx.sendToolBreakStatus(hand));
-//            } else {
-//                stack.decrement(1);
-//            }
-//        }
-//
-//        player.incrementStat(Stats.USED.getOrCreateStat(item));
-//        return ActionResult.success(world.isClient);
-//    }
+	@Override
+	protected ItemActionResult onUseWithItem(ItemStack stack, BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		if (!stack.isOf(Items.FLINT_AND_STEEL) && !stack.isOf(Items.FIRE_CHARGE) || state.get(LIT))
+			return super.onUseWithItem(stack, state, world, pos, player, hand, hit);
+
+		this.onIgnited(world, pos);
+		Item item = stack.getItem();
+		if (!player.isCreative()) {
+			if (stack.isOf(Items.FLINT_AND_STEEL)) {
+				stack.damage(1, player, LivingEntity.getSlotForHand(hand));
+			} else {
+				stack.decrement(1);
+			}
+		}
+
+		player.incrementStat(Stats.USED.getOrCreateStat(item));
+		return ItemActionResult.success(true);
+	}
 
 	@Override
 	public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
@@ -157,7 +158,6 @@ public class SteelWoolBlock extends Block implements Ignitable {
 			if (state.getBlock() instanceof Ignitable block) {
 				if (!block.onIgnited(world, pos)) return;
 			}
-			System.out.println("test");
 			world.setBlockState(pos, ((FireBlock) Blocks.FIRE).getStateForPosition(world, pos), 3);
 		}
 	}

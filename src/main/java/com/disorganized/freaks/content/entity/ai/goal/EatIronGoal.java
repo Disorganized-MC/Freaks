@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class EatIronGoal extends Goal {
 
 	private static final int MAX_TIMER = 100;
-	private static final int GRAZING_CHANCE = 25;
+	private static final int GRAZING_CHANCE = 2500;
 
 	private final AbstractSheeperEntity entity;
 	private final World world;

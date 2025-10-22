@@ -1,6 +1,7 @@
 package com.disorganized.freaks.content.entity;
 
 import com.disorganized.freaks.registry.ModSoundEvents;
+import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
@@ -29,7 +30,7 @@ public class SheeperEntity extends AbstractSheeperEntity {
 	}
 
 	@Override
-	protected /* @Nullable */ SoundEvent getAmbientSound() {
+	protected SoundEvent getAmbientSound() {
 		return ModSoundEvents.ENTITY_SHEEPER_AMBIENT;
 	}
 

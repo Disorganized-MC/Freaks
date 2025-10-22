@@ -2,6 +2,7 @@ package com.disorganized.freaks.content.entity;
 
 import com.disorganized.freaks.registry.ModDamageTypes;
 import com.disorganized.freaks.registry.ModEntityTypes;
+import com.mojang.serialization.Codec;
 import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -15,13 +16,20 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.Uuids;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 public class MudBubbleEntity extends Entity implements Ownable {
+
+//	public static final Codec<Entity> OWNER_CODEC = Uuids.CODEC.xmap(
+//		e ->
+//	);
 
 	private @Nullable Entity owner;
 	private @Nullable LivingEntity target;
@@ -37,7 +45,10 @@ public class MudBubbleEntity extends Entity implements Ownable {
 		this.setOwner(owner);
 	}
 
+	@Override
+	protected void initDataTracker(DataTracker.Builder builder) {
 
+	}
 
 	@Override
 	public @Nullable Entity getOwner() {
@@ -64,9 +75,9 @@ public class MudBubbleEntity extends Entity implements Ownable {
 //		this.kill();
 //	}
 
-	protected void onHit(LivingEntity target) {
-		System.out.println("aa");
-	}
+//	protected void onHit(LivingEntity target) {
+//		System.out.println("aa");
+//	}
 
 	public DamageSource createDamageSource(Entity entity, Entity owner) {
 		RegistryEntry<DamageType> type = this.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.STEEL_WOOL);
@@ -87,11 +98,6 @@ public class MudBubbleEntity extends Entity implements Ownable {
 	public void kill() {
 		super.kill();
 		this.playSound(SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1, 1);
-	}
-
-	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
-
 	}
 
 	@Override
@@ -125,7 +131,6 @@ public class MudBubbleEntity extends Entity implements Ownable {
 			Vec3d direction = targetPos.subtract(currentPos).normalize();
 
 			this.setVelocity(direction.multiply(0.5));
-			System.out.println(this.getVelocity());
 			this.velocityModified = true;
 			this.velocityDirty = true;
 		}

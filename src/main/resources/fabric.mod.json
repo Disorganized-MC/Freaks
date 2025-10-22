@@ -17,6 +17,11 @@
 	},
 	"mixins": [ "freaks.mixins.json" ],
 	"accessWidener": "freaks.accesswidener",
+	"custom": {
+		"loom:injected_interfaces": {
+			"net/minecraft/world/explosion/Explosion": [ "com/disorganized/freaks/access/FreaksExplosion" ]
+		}
+	},
 
 	"depends": {
 		"minecraft": "*",
