@@ -6,7 +6,6 @@ import com.disorganized.freaks.content.entity.ai.goal.SheeperFleeGoal;
 import com.disorganized.freaks.registry.ModLootTables;
 import com.disorganized.freaks.registry.ModSoundEvents;
 import com.disorganized.freaks.registry.ModTags;
-import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Shearable;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
@@ -37,21 +36,30 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.Explosion;
-import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib.animatable.GeoAnimatable;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimatableManager;
+import software.bernie.geckolib.animation.AnimationController;
+import software.bernie.geckolib.animation.PlayState;
+import software.bernie.geckolib.animation.RawAnimation;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.UUID;
+public abstract class AbstractSheeperEntity extends CreeperEntity implements HissingEntity, Shearable, GeoEntity {
 
-public abstract class AbstractSheeperEntity extends CreeperEntity implements HissingEntity, Shearable {
-
-	public final AnimationState idlingAnimationState = new AnimationState();
-	public int idleAnimationCooldown = 0;
-	public final AnimationState startGrazingState = new AnimationState();
-	public final AnimationState stopGrazingState = new AnimationState();
+	public static final RawAnimation WALKING = RawAnimation.begin().thenLoop("walking");
+	public static final RawAnimation IDLING = RawAnimation.begin().thenLoop("idling");
+	public static final RawAnimation GRAZING_START = RawAnimation.begin().thenPlay("grazing_start");
+	public static final RawAnimation GRAZING_LOOP = RawAnimation.begin().thenLoop("grazing_loop");
+	public static final RawAnimation GRAZING_STOP = RawAnimation.begin().thenPlay("grazing_stop");
 
 	public static final int MAX_WOOL_LAYERS = 4;
 
 	protected static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	protected static final TrackedData<Boolean> GRAZING = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+
+	private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
+	private boolean wasGrazing = false;
 
 	public AbstractSheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
 		super(entityType, world);
@@ -144,29 +152,6 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
-		if (this.getWorld().isClient) this.updateAnimations();
-	}
-
-	private void updateAnimations() {
-//		if (this.idleAnimationCooldown <= 0) {
-//			this.idleAnimationCooldown = this.random.nextInt(40) + 80;
-		this.idlingAnimationState.start(this.age);
-//		} else {
-//			--this.idleAnimationCooldown;
-//		}
-
-//		if (this.isGrazing()) {
-//			this.startGrazingState.startIfNotRunning(this.age);
-//			this.stopGrazingState.stop();
-//		} else {
-//			this.stopGrazingState.startIfNotRunning(this.age);
-//			this.startGrazingState.stop();
-//		}
-	}
-
-	@Override
 	public void onEatingGrass() {
 		super.onEatingGrass();
 		this.addWoolLayer();
@@ -238,6 +223,39 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 		return (int)(this.fuseTime * (1 + this.getWoolLayers() * 0.5));
 	}
 
+	@Override
+	public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+		controllers.add(new AnimationController<>(this, "movement", 0, state -> {
+			boolean isGrazing = this.isGrazing();
+
+			if (isGrazing && !this.wasGrazing) {
+				this.wasGrazing = true;
+				return state.setAndContinue(GRAZING_START);
+			}
+			if (!isGrazing && this.wasGrazing) {
+				this.wasGrazing = false;
+				return state.setAndContinue(GRAZING_STOP);
+			}
+			if (isGrazing && this.wasGrazing) {
+				if (state.getController().hasAnimationFinished()) {
+					return state.setAndContinue(GRAZING_LOOP);
+				}
+				return PlayState.CONTINUE;
+			}
+
+			// Not grazing - normal movement animations
+			if (state.isMoving()) {
+				return state.setAndContinue(WALKING);
+			}
+
+			return state.setAndContinue(IDLING);
+		}));
+	}
+
+	@Override
+	public AnimatableInstanceCache getAnimatableInstanceCache() {
+		return this.animationCache;
+	}
 
 	public static DefaultAttributeContainer.Builder createMobAttributes() {
 		return CreeperEntity.createMobAttributes().add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.15);

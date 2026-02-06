@@ -25,11 +25,13 @@ public class ModEntityRenderers {
 
 	public static void init() {
 		EntityRendererRegistry.register(ModEntityTypes.SHEEPER, SheeperRenderer::new);
-		EntityModelLayerRegistry.registerModelLayer(SHEEPER_LAYER, () -> SheeperModel.getTexturedModelData(Dilation.NONE));
-		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_1_LAYER, SheeperWoolModel::getFirstLayerModelData);
-		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_2_LAYER, SheeperWoolModel::getSecondLayerModelData);
-		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_3_LAYER, SheeperWoolModel::getThirdLayerModelData);
-		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_4_LAYER, SheeperWoolModel::getFourthLayerModelData);
+
+//		EntityRendererRegistry.register(ModEntityTypes.SHEEPER, SheeperRenderer::new);
+//		EntityModelLayerRegistry.registerModelLayer(SHEEPER_LAYER, () -> SheeperModel.getTexturedModelData(Dilation.NONE));
+//		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_1_LAYER, SheeperWoolModel::getFirstLayerModelData);
+//		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_2_LAYER, SheeperWoolModel::getSecondLayerModelData);
+//		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_3_LAYER, SheeperWoolModel::getThirdLayerModelData);
+//		EntityModelLayerRegistry.registerModelLayer(SHEEPER_WOOL_4_LAYER, SheeperWoolModel::getFourthLayerModelData);
 
 		EntityRendererRegistry.register(ModEntityTypes.MUCK, MuckRenderer::new);
 		EntityModelLayerRegistry.registerModelLayer(MUCK_LAYER, MuckModel::getTexturedModelData);
