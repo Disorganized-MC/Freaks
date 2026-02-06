@@ -3,8 +3,6 @@ package com.disorganized.freaks;
 import com.disorganized.freaks.registry.*;
 import net.fabricmc.api.ModInitializer;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FireBlock;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +20,7 @@ public class Freaks implements ModInitializer {
 	public void onInitialize() {
 		ModItems.init();
 		ModBlocks.init();
-		ModBlockTags.init();
+		ModTags.init();
 		ModDamageTypes.init();
 		ModSoundEvents.init();
 		ModEntityTypes.init();

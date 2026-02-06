@@ -32,9 +32,8 @@ public abstract class FireBlockMixin extends Block {
 	@Inject(method = "trySpreadingFire", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/BlockState;", ordinal = 1, shift = At.Shift.AFTER), cancellable = true)
 	private void customIgnitionHandling(World world, BlockPos pos, int spreadFactor, Random random, int currentAge, CallbackInfo ci) {
 		BlockState state = world.getBlockState(pos);
-		if (state.getBlock() instanceof Ignitable block) {
-			if (!block.onIgnited(world, pos)) ci.cancel();
-		}
+		if (state.getBlock() instanceof Ignitable ignitable)
+			if (!ignitable.onIgnited(world, pos)) ci.cancel();
 	}
 
 }

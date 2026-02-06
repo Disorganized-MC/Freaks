@@ -1,7 +1,7 @@
 package com.disorganized.freaks.content.entity.ai.goal;
 
 import com.disorganized.freaks.content.entity.AbstractSheeperEntity;
-import com.disorganized.freaks.registry.ModBlockTags;
+import com.disorganized.freaks.registry.ModTags;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -30,7 +30,7 @@ public class EatIronGoal extends Goal {
 		if (!this.entity.canGrowWool()) return false;
 		if (this.entity.getRandom().nextInt(GRAZING_CHANCE) != 0) return false;
 		BlockPos pos = this.entity.getSteppingPos();
-		return this.world.getBlockState(pos).isIn(ModBlockTags.SHEEPER_PASTURES);
+		return this.world.getBlockState(pos).isIn(ModTags.SHEEPER_PASTURES);
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class EatIronGoal extends Goal {
 		if (this.timer.get() != 0) return;
 
 		BlockPos pos = this.entity.getBlockPos().down();
-		if (!this.world.getBlockState(pos).isIn(ModBlockTags.SHEEPER_PASTURES)) return;
+		if (!this.world.getBlockState(pos).isIn(ModTags.SHEEPER_PASTURES)) return;
 
 		this.entity.setGrazing(false);
 		this.entity.onEatingGrass();

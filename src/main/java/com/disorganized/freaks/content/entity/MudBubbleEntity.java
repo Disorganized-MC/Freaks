@@ -1,40 +1,32 @@
 package com.disorganized.freaks.content.entity;
 
-import com.disorganized.freaks.registry.ModDamageTypes;
 import com.disorganized.freaks.registry.ModEntityTypes;
-import com.mojang.serialization.Codec;
-import net.minecraft.component.ComponentMapImpl;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.Ownable;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageType;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.*;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.predicate.entity.EntityPredicates;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Uuids;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Predicate;
 
-public class MudBubbleEntity extends Entity implements Ownable {
+public class MudBubbleEntity extends ProjectileEntity {
 
-//	public static final Codec<Entity> OWNER_CODEC = Uuids.CODEC.xmap(
-//		e ->
-//	);
+	protected @Nullable LivingEntity target;
+	private @Nullable Vec3d overshotTarget = null;
+	protected int lifespan = 200;
 
-	private @Nullable Entity owner;
-	private @Nullable LivingEntity target;
-	private int targetTimeout = 0;
-	private int lifespan = 200;
+	private static final float ACCELERATION = 0.1F;
+	private static final float MAX_SPEED = 2;
+	private static final float DRAG = 0.8F;
 
 	public MudBubbleEntity(EntityType<MudBubbleEntity> type, World world) {
 		super(type, world);
@@ -43,127 +35,139 @@ public class MudBubbleEntity extends Entity implements Ownable {
 	public MudBubbleEntity(World world, Entity owner) {
 		super(ModEntityTypes.MUD_BUBBLE, world);
 		this.setOwner(owner);
+		this.noClip = true;
 	}
 
 	@Override
-	protected void initDataTracker(DataTracker.Builder builder) {
+	protected void initDataTracker(DataTracker.Builder builder) {}
 
+	@Override
+	protected void readCustomDataFromNbt(NbtCompound nbt) {
+		super.readCustomDataFromNbt(nbt);
 	}
 
 	@Override
-	public @Nullable Entity getOwner() {
-		return this.owner;
+	protected void writeCustomDataToNbt(NbtCompound nbt) {
+		super.writeCustomDataToNbt(nbt);
 	}
 
-	public void setOwner(@Nullable Entity entity) {
-		this.owner = entity;
+	public @Nullable LivingEntity getTarget() {
+		return this.target;
 	}
 
-	public static MudBubbleEntity spawnAt(World world, Entity owner) {
-		return new MudBubbleEntity(world, owner);
-	}
-
-//	@Override
-//	protected void onEntityHit(EntityHitResult result) {
-//		super.onEntityHit(result);
-//		Entity entity = result.getEntity();
-//		Entity owner = this.getOwner();
-//		DamageSource source = createDamageSource(entity, owner);
-//		if (!entity.damage(source, 3)) return;
-//
-//		if (entity instanceof LivingEntity target) this.onHit(target);
-//		this.kill();
-//	}
-
-//	protected void onHit(LivingEntity target) {
-//		System.out.println("aa");
-//	}
-
-	public DamageSource createDamageSource(Entity entity, Entity owner) {
-		RegistryEntry<DamageType> type = this.getWorld().getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).entryOf(ModDamageTypes.STEEL_WOOL);
-		if (owner == null) {
-			return new DamageSource(type);
-		}
-		if (owner instanceof LivingEntity living) living.onAttacking(entity);
-		return new DamageSource(type, owner);
-	}
-
-//	@Override
-//	protected void onBlockHit(BlockHitResult blockHitResult) {
-//		super.onBlockHit(blockHitResult);
-//		this.kill();
-//	}
-
-	@Override
-	public void kill() {
-		super.kill();
-		this.playSound(SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1, 1);
+	public void setTarget(@Nullable LivingEntity target) {
+		this.target = target;
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
-		--this.lifespan;
+
+		this.lifespan--;
 		if (this.lifespan <= 0) {
 			this.kill();
 			return;
 		}
 
-		if (this.target == null) {
-			if (this.targetTimeout <= 0) {
-				this.target = findNewTarget();
-				this.targetTimeout = 60;
-			} else {
-				this.targetTimeout--;
-				return;
-			}
+		if (this.age % 20 == 0) {
+			this.target = this.findNewTarget();
 		}
 
-		if (this.target != null && this.target.isAlive()) {
-			if (this.distanceTo(this.target) > 5) {
-				this.target = null;
-				this.targetTimeout = 60;
-				return;
-			}
+		if (this.target != null && (!this.target.isAlive() || this.target.isRemoved())) {
+			this.target = null;
+			this.overshotTarget = null;
+		}
 
-			Vec3d targetPos = this.target.getPos().add(0, this.target.getHeight() / 2, 0);
-			Vec3d currentPos = this.getPos();
-			Vec3d direction = targetPos.subtract(currentPos).normalize();
+		this.moveToTarget();
+		this.move(MovementType.SELF, this.getVelocity());
 
-			this.setVelocity(direction.multiply(0.5));
-			this.velocityModified = true;
+		this.checkEntityCollisions();
+	}
+
+	@Nullable
+	private LivingEntity findNewTarget() {
+		List<LivingEntity> nearbyEntities = this.getWorld().getEntitiesByClass(
+			LivingEntity.class,
+			this.getBoundingBox().expand(16),
+			entity -> (entity instanceof PlayerEntity || entity instanceof IronGolemEntity)
+				&& entity.isAlive()
+				&& !entity.isRemoved()
+				&& entity != this.getOwner()
+		);
+
+		return nearbyEntities.stream()
+			.min(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(this)))
+			.orElse(null);
+	}
+
+	private void moveToTarget() {
+		Vec3d currentVelocity = this.getVelocity();
+
+		if (this.target == null && this.overshotTarget == null) {
+			this.setVelocity(currentVelocity.multiply(DRAG));
 			this.velocityDirty = true;
+			this.velocityModified = true;
+			return;
+		}
+
+		Vec3d steerToward;
+		if (this.overshotTarget != null) {
+			steerToward = this.overshotTarget;
+		} else {
+			steerToward = this.target.getPos();
+		}
+
+		Vec3d toTarget = steerToward.subtract(this.getPos());
+		double distToTarget = toTarget.length();
+
+		if (this.overshotTarget == null && distToTarget < 1.5 && currentVelocity.lengthSquared() > 0.005F) {
+			this.overshotTarget = steerToward;
+		}
+
+		if (this.overshotTarget != null && currentVelocity.lengthSquared() < 0.002F) {
+			this.overshotTarget = null;
+		}
+
+		Vec3d direction = toTarget.normalize();
+		Vec3d acceleration = direction.multiply(ACCELERATION);
+		Vec3d newVelocity = currentVelocity.add(acceleration);
+
+		double speed = newVelocity.length();
+		if (speed > MAX_SPEED) {
+			newVelocity = newVelocity.multiply(MAX_SPEED / speed);
+		}
+		newVelocity = newVelocity.multiply(DRAG);
+
+		this.setVelocity(newVelocity);
+		this.velocityDirty = true;
+		this.velocityModified = true;
+	}
+
+	public static final Predicate<Entity> COLLISION_PREDICATE = EntityPredicates.EXCEPT_CREATIVE_OR_SPECTATOR.and(entity -> entity instanceof LivingEntity);
+
+	private void checkEntityCollisions() {
+		List<Entity> collidingEntities = this.getWorld().getOtherEntities(this, this.getBoundingBox(), COLLISION_PREDICATE);
+		for (Entity entity : collidingEntities) {
+			if (entity == this.getOwner()) continue;
+
+			entity.damage(this.getDamageSources().mobAttack((LivingEntity) this.getOwner()), 1.0f);
+			this.kill();
+			break;
 		}
 	}
 
 	@Override
-	protected void readCustomDataFromNbt(NbtCompound nbt) {
-		if (nbt.containsUuid("owner")) {
-			this.owner = this.getWorld().getPlayerByUuid(nbt.getUuid("owner"));
-		}
+	protected void onBlockCollision(BlockState state) {
+		super.onBlockCollision(state);
+		if (state.isAir()) return;
+
+		this.kill();
 	}
 
 	@Override
-	protected void writeCustomDataToNbt(NbtCompound nbt) {
-		if (this.owner != null) {
-			nbt.putUuid("owner", this.owner.getUuid());
-		}
-	}
-
-	public @Nullable LivingEntity findNewTarget() {
-		World world = this.getWorld();
-		Vec3d pos = this.getPos();
-		return world.getClosestPlayer(pos.x, pos.y, pos.z, 15, true);
-	}
-
-	@Override
-	public void setComponents(ComponentMapImpl components) {
-
-	}
-
-	@Override
-	public ComponentMapImpl getMutableComponents() {
-		return null;
+	public void kill() {
+		super.kill();
+		this.playSound(SoundEvents.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 1, 1);
 	}
 
 }

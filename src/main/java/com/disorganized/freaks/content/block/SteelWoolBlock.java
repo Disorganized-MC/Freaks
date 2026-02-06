@@ -22,7 +22,6 @@ import net.minecraft.stat.Stats;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -111,7 +110,7 @@ public class SteelWoolBlock extends Block implements Ignitable {
 			);
 		}
 
-		if (random.nextInt(2) == 0) world.addParticle(
+		for (int i = 0; i < 4; i++) world.addParticle(
 			ParticleTypes.LAVA,
 			pos.getX() + 0.5, pos.getY() + 0.25, pos.getZ() + 0.5,
 			random.nextDouble(), random.nextDouble() + 1, random.nextDouble()
@@ -144,16 +143,17 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		int spreadChance = world.getBiome(pos).isIn(BiomeTags.INCREASED_FIRE_BURNOUT) ? -50 : 0;
 		List<BlockPos> neighbours = getNeighbours(pos);
 		for (BlockPos nPos : neighbours) {
-			this.trySpreadingFire(world, nPos, 300 + spreadChance, random);
+			this.trySpreadingFire(world, nPos, 500 + spreadChance, random);
 			this.trySettingFire(world, nPos, spreadChance, random);
 		}
+		world.setBlockState(pos, Blocks.AIR.getDefaultState(), 3);
 	}
 
 	private void trySpreadingFire(World world, BlockPos pos, int spreadFactor, Random random) {
-		int spreadChance = ((FireBlock)Blocks.FIRE).getSpreadChance(world.getBlockState(pos));
-		if (random.nextInt(spreadFactor) >= spreadChance) return;
+//		int spreadChance = ((FireBlock)Blocks.FIRE).getSpreadChance(world.getBlockState(pos));
+//		if (random.nextInt(spreadFactor) >= spreadChance) return;
 
-		if (random.nextInt(10) < 5 && !world.hasRain(pos)) {
+		if (!world.hasRain(pos)) {
 			BlockState state = world.getBlockState(pos);
 			if (state.getBlock() instanceof Ignitable block) {
 				if (!block.onIgnited(world, pos)) return;
@@ -171,9 +171,8 @@ public class SteelWoolBlock extends Block implements Ignitable {
 		burnChance = (burnChance + 40 + world.getDifficulty().getId() * 10) / 30;
 		if (world.getBiome(pos).isIn(BiomeTags.INCREASED_FIRE_BURNOUT)) burnChance /= 2;
 
-		if (random.nextInt(100) <= burnChance) {
+		if (random.nextInt(100) <= burnChance)
 			world.setBlockState(pos, ((FireBlock) Blocks.FIRE).getStateForPosition(world, pos), 3);
-		}
 	}
 
 	@Override
@@ -184,15 +183,11 @@ public class SteelWoolBlock extends Block implements Ignitable {
         List<BlockPos> neighbours = getNeighbours(pos);
         for (BlockPos nPos : neighbours) {
             BlockState nState = world.getBlockState(nPos);
-            if (nState.getBlock() instanceof Oxidizable) scrubState(world, nState, nPos, state.get(LIT));
+            if (nState.getBlock() instanceof Oxidizable) scrubBlock(world, nState, nPos, state.get(LIT));
         }
     }
 
-	public List<BlockPos> getNeighbours(BlockPos pos) {
-		return List.of(pos.up(), pos.down(), pos.north(), pos.south(), pos.east(), pos.west());
-	}
-
-	public void scrubState(World world, BlockState state, BlockPos pos, boolean lit) {
+	public void scrubBlock(World world, BlockState state, BlockPos pos, boolean lit) {
 		BlockState scrubbedState = null;
 		Optional<BlockState> maybeState = Oxidizable.getDecreasedOxidationState(state);
 		if (lit) {
@@ -207,19 +202,13 @@ public class SteelWoolBlock extends Block implements Ignitable {
 
         world.setBlockState(pos, scrubbedState);
         world.playSound(null, pos, ModSoundEvents.BLOCK_STEEL_WOOL_SCRUB, SoundCategory.BLOCKS, 1.0F, 1.0F);
-		// i hate these magic bullshit methods
+		// i hate these magic methods
 		world.syncWorldEvent(null, 3004, pos, 0);
 	}
 
-//    public void scrubState(World world, BlockState state, BlockPos blockPos, boolean lit) {
-//        Optional<BlockState> scrubbedState = Oxidizable.getDecreasedOxidationState(state);
-//        if (scrubbedState.isEmpty()) return;
-//
-//        world.setBlockState(blockPos, scrubbedState.get());
-//        world.playSound(null, blockPos, ModSoundEvents.BLOCK_STEEL_WOOL_SCRUB, SoundCategory.BLOCKS, 1.0F, 1.0F);
-//		// i hate these magic bullshit methods
-//		world.syncWorldEvent(null, 3004, blockPos, 0);
-//	}
+	public List<BlockPos> getNeighbours(BlockPos pos) {
+		return List.of(pos.up(), pos.down(), pos.north(), pos.south(), pos.east(), pos.west());
+	}
 
 	// TODO make this actually work i give up for now
     @Override

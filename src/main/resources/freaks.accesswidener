@@ -12,6 +12,7 @@ accessible field net/minecraft/entity/mob/CreeperEntity explosionRadius I
 extendable method net/minecraft/entity/mob/CreeperEntity explode ()V
 accessible method net/minecraft/entity/mob/CreeperEntity spawnEffectsCloud ()V
 accessible field net/minecraft/entity/mob/CreeperEntity fuseTime I
+accessible field net/minecraft/entity/passive/PassiveEntity CHILD Lnet/minecraft/entity/data/TrackedData;
 
 # Muck
 accessible class net/minecraft/entity/mob/SlimeEntity$SlimeMoveControl

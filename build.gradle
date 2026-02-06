@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.10-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom-remap' version '1.14-SNAPSHOT'
 }
 
 base.archivesName = project.mod_id
@@ -24,7 +24,6 @@ dependencies {
 	mappings "net.fabricmc:yarn:$yarn_mappings:v2"
 	modImplementation "net.fabricmc:fabric-loader:$loader_version"
 	modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
-	modImplementation "org.sindercube:iconic:$iconic_version"
 }
 
 processResources {

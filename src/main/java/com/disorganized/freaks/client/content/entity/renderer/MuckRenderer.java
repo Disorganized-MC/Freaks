@@ -9,7 +9,9 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public class MuckRenderer extends MobEntityRenderer<MuckEntity, MuckModel<MuckEntity>> {
 
@@ -26,9 +28,13 @@ public class MuckRenderer extends MobEntityRenderer<MuckEntity, MuckModel<MuckEn
 	}
 
 	@Override
-	protected void scale(MuckEntity entity, MatrixStack matrices, float f) {
-		float size = entity.getSize();
-		matrices.scale(size, size, size);
+	protected void scale(MuckEntity slimeEntity, MatrixStack matrixStack, float f) {
+		matrixStack.scale(0.999F, 0.999F, 0.999F);
+		matrixStack.translate(0.0F, 0.001F, 0.0F);
+		float size = (float)slimeEntity.getSize();
+		float i = MathHelper.lerp(f, slimeEntity.lastStretch, slimeEntity.stretch) / (size * 0.5F + 1.0F);
+		float j = 1.0F / (i + 1.0F);
+		matrixStack.scale(j * size, 1.0F / j * size, j * size);
 	}
 
 	@Override

@@ -15,7 +15,7 @@ import net.minecraft.util.Identifier;
 public class SheeperWoolRenderer extends FeatureRenderer<SheeperEntity, SheeperModel<SheeperEntity>> {
 
 	public static final Identifier DEFAULT = Freaks.of("textures/entity/sheeper/wool/default.png");
-	public static final Identifier FLAMING = Freaks.of("textures/entity/sheeper/wool/flaming.png");
+	public static final Identifier FLAMING = Freaks.of("textures/entity/sheeper/wool/lit.png");
 
 	private final SheeperWoolModel<SheeperEntity> model;
 

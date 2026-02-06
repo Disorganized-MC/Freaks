@@ -5,8 +5,7 @@ import com.disorganized.freaks.content.entity.ai.goal.EatIronGoal;
 import com.disorganized.freaks.content.entity.ai.goal.SheeperFleeGoal;
 import com.disorganized.freaks.registry.ModLootTables;
 import com.disorganized.freaks.registry.ModSoundEvents;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentMapImpl;
+import com.disorganized.freaks.registry.ModTags;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Shearable;
@@ -22,6 +21,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.OcelotEntity;
+import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -32,19 +32,24 @@ import net.minecraft.loot.context.LootContextTypes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 
-public abstract class AbstractSheeperEntity  extends CreeperEntity implements HissingEntity, Shearable {
+import java.util.UUID;
+
+public abstract class AbstractSheeperEntity extends CreeperEntity implements HissingEntity, Shearable {
 
 	public final AnimationState startGrazingState = new AnimationState();
 	public final AnimationState stopGrazingState = new AnimationState();
 
 	private static final int MAX_WOOL_LAYERS = 4;
+	protected static final int BREEDING_COOLDOWN = 6000;
+	private int loveTicks;
+	private @Nullable UUID lovingPlayer;
 
 	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
 	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
@@ -61,15 +66,15 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 		this.explosionRadius = 9;
 	}
 
-	@Override
-	public ComponentMapImpl getMutableComponents() {
-		return new ComponentMapImpl(ComponentMap.EMPTY);
-	}
+//	@Override
+//	public ComponentMapImpl getMutableComponents() {
+//		return new ComponentMapImpl(ComponentMap.EMPTY);
+//	}
 
-	@Override
-	public void setComponents(ComponentMapImpl components) {
-
-	}
+//	@Override
+//	public void setComponents(ComponentMapImpl components) {
+//
+//	}
 
 	@Override
 	protected void initGoals() {
@@ -119,13 +124,26 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 	@Override
 	public void writeCustomDataToNbt(NbtCompound nbt) {
 		super.writeCustomDataToNbt(nbt);
+//		nbt.putInt("age", this.getBreedingAge());
+//		nbt.putInt("forced_age", this.forcedAge);
 		nbt.putInt("wool_layers", this.getWoolLayers());
 	}
 
 	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
+//		this.setBreedingAge(nbt.getInt("age"));
+//		this.forcedAge = nbt.getInt("forced_age");
 		this.setWoolLayers(nbt.getInt("wool_layers"));
+	}
+
+	@Override
+	public void onTrackedDataSet(TrackedData<?> data) {
+		if (PassiveEntity.CHILD.equals(data)) {
+			this.calculateDimensions();
+		}
+
+		super.onTrackedDataSet(data);
 	}
 
 	@Override
@@ -162,11 +180,42 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 
 	protected ActionResult interactMob(PlayerEntity player, Hand hand) {
 		ItemStack stack = player.getStackInHand(hand);
-		if (!this.isShearable() || !stack.isOf(Items.SHEARS)) return super.interactMob(player, hand);
+		if (stack.isIn(ModTags.SHEEPER_FOOD)) {
+//			return this.tryFeed(stack, player, hand);
+		} else if (this.isShearable() || stack.isOf(Items.SHEARS)) {
+			return this.tryShear(stack, player, hand);
+		}
+		return super.interactMob(player, hand);
+	}
 
+//	public ActionResult tryFeed(ItemStack stack, PlayerEntity player, Hand hand) {
+//		int age = this.getBreedingAge();
+//		if (!this.getWorld().isClient && age == 0 && this.canEat()) {
+//			stack.decrementUnlessCreative(1, player);
+//			this.loveTicks = 600;
+//			if (player != null) this.lovingPlayer = player.getUuid();
+//			this.getWorld().sendEntityStatus(this, (byte)18);
+//			this.ignite();
+//
+//			return ActionResult.SUCCESS;
+//		}
+//
+//		if (this.isBaby()) {
+//			stack.decrementUnlessCreative(1, player);
+//			int toGrowUp = (int)((float)(-age / 20) * 0.1F);
+//			this.growUp(toGrowUp, true);
+//			return ActionResult.success(this.getWorld().isClient);
+//		}
+//
+//		if (this.getWorld().isClient) return ActionResult.CONSUME;
+//		return ActionResult.PASS;
+//	}
+
+	public ActionResult tryShear(ItemStack stack, PlayerEntity player, Hand hand) {
 		this.sheared(SoundCategory.PLAYERS);
 		this.emitGameEvent(GameEvent.SHEAR, player);
 		if (!this.getWorld().isClient) stack.damage(1, player, getSlotForHand(hand));
+		this.ignite();
 
 		return ActionResult.success(this.getWorld().isClient);
 	}
@@ -189,6 +238,41 @@ public abstract class AbstractSheeperEntity  extends CreeperEntity implements Hi
 			.build(LootContextTypes.SHEARING);
 		table.generateLoot(parameters).forEach(stack -> this.dropStack(stack, this.getHeight()));
 	}
+
+//	public int getBreedingAge() {
+//		if (this.getWorld().isClient) {
+//			return (Boolean)this.dataTracker.get(PassiveEntity.CHILD) ? -1 : 1;
+//		} else {
+//			return this.breedingAge;
+//		}
+//	}
+
+//	public void growUp(int age, boolean overGrow) {
+//		int i = this.getBreedingAge();
+//		int j = i;
+//		i += age * 20;
+//		if (i > 0) {
+//			i = 0;
+//		}
+//
+//		int k = i - j;
+//		this.setBreedingAge(i);
+//		if (overGrow) {
+//			this.forcedAge += k;
+//			if (this.happyTicksRemaining == 0) {
+//				this.happyTicksRemaining = 40;
+//			}
+//		}
+//
+//		if (this.getBreedingAge() == 0) {
+//			this.setBreedingAge(this.forcedAge);
+//		}
+//
+//	}
+
+//	public void growUp(int age) {
+//		this.growUp(age, false);
+//	}
 
 	@Override
 	public int getFuseTime() {
