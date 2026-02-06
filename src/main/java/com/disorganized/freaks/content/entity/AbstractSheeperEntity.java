@@ -43,16 +43,15 @@ import java.util.UUID;
 
 public abstract class AbstractSheeperEntity extends CreeperEntity implements HissingEntity, Shearable {
 
+	public final AnimationState idlingAnimationState = new AnimationState();
+	public int idleAnimationCooldown = 0;
 	public final AnimationState startGrazingState = new AnimationState();
 	public final AnimationState stopGrazingState = new AnimationState();
 
-	private static final int MAX_WOOL_LAYERS = 4;
-	protected static final int BREEDING_COOLDOWN = 6000;
-	private int loveTicks;
-	private @Nullable UUID lovingPlayer;
+	public static final int MAX_WOOL_LAYERS = 4;
 
-	private static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
-	private static final TrackedData<Boolean> GRAZING = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+	protected static final TrackedData<Integer> WOOL_LAYERS = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.INTEGER);
+	protected static final TrackedData<Boolean> GRAZING = DataTracker.registerData(AbstractSheeperEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
 	public AbstractSheeperEntity(EntityType<? extends CreeperEntity> entityType, World world) {
 		super(entityType, world);
@@ -65,16 +64,6 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 		builder.add(GRAZING, false);
 		this.explosionRadius = 9;
 	}
-
-//	@Override
-//	public ComponentMapImpl getMutableComponents() {
-//		return new ComponentMapImpl(ComponentMap.EMPTY);
-//	}
-
-//	@Override
-//	public void setComponents(ComponentMapImpl components) {
-//
-//	}
 
 	@Override
 	protected void initGoals() {
@@ -89,7 +78,7 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 	}
 
 	public int getWoolLayers() {
-		return this.dataTracker.get(WOOL_LAYERS);
+		return Math.clamp(this.dataTracker.get(WOOL_LAYERS), 0, AbstractSheeperEntity.MAX_WOOL_LAYERS);
 	}
 
 	private void setWoolLayers(int layers) {
@@ -124,16 +113,12 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 	@Override
 	public void writeCustomDataToNbt(NbtCompound nbt) {
 		super.writeCustomDataToNbt(nbt);
-//		nbt.putInt("age", this.getBreedingAge());
-//		nbt.putInt("forced_age", this.forcedAge);
 		nbt.putInt("wool_layers", this.getWoolLayers());
 	}
 
 	@Override
 	public void readCustomDataFromNbt(NbtCompound nbt) {
 		super.readCustomDataFromNbt(nbt);
-//		this.setBreedingAge(nbt.getInt("age"));
-//		this.forcedAge = nbt.getInt("forced_age");
 		this.setWoolLayers(nbt.getInt("wool_layers"));
 	}
 
@@ -161,15 +146,24 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 	@Override
 	public void tick() {
 		super.tick();
-		if (!this.getWorld().isClient) return;
+		if (this.getWorld().isClient) this.updateAnimations();
+	}
 
-		if (this.isGrazing()) {
-			this.startGrazingState.startIfNotRunning(this.age);
-			this.stopGrazingState.stop();
-		} else {
-			this.stopGrazingState.startIfNotRunning(this.age);
-			this.startGrazingState.stop();
-		}
+	private void updateAnimations() {
+//		if (this.idleAnimationCooldown <= 0) {
+//			this.idleAnimationCooldown = this.random.nextInt(40) + 80;
+		this.idlingAnimationState.start(this.age);
+//		} else {
+//			--this.idleAnimationCooldown;
+//		}
+
+//		if (this.isGrazing()) {
+//			this.startGrazingState.startIfNotRunning(this.age);
+//			this.stopGrazingState.stop();
+//		} else {
+//			this.stopGrazingState.startIfNotRunning(this.age);
+//			this.startGrazingState.stop();
+//		}
 	}
 
 	@Override
@@ -238,41 +232,6 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 			.build(LootContextTypes.SHEARING);
 		table.generateLoot(parameters).forEach(stack -> this.dropStack(stack, this.getHeight()));
 	}
-
-//	public int getBreedingAge() {
-//		if (this.getWorld().isClient) {
-//			return (Boolean)this.dataTracker.get(PassiveEntity.CHILD) ? -1 : 1;
-//		} else {
-//			return this.breedingAge;
-//		}
-//	}
-
-//	public void growUp(int age, boolean overGrow) {
-//		int i = this.getBreedingAge();
-//		int j = i;
-//		i += age * 20;
-//		if (i > 0) {
-//			i = 0;
-//		}
-//
-//		int k = i - j;
-//		this.setBreedingAge(i);
-//		if (overGrow) {
-//			this.forcedAge += k;
-//			if (this.happyTicksRemaining == 0) {
-//				this.happyTicksRemaining = 40;
-//			}
-//		}
-//
-//		if (this.getBreedingAge() == 0) {
-//			this.setBreedingAge(this.forcedAge);
-//		}
-//
-//	}
-
-//	public void growUp(int age) {
-//		this.growUp(age, false);
-//	}
 
 	@Override
 	public int getFuseTime() {

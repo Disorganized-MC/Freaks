@@ -10,12 +10,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
-public class SheeperRenderer extends MobEntityRenderer<SheeperEntity, SheeperModel<SheeperEntity>> {
+public class SheeperRenderer extends MobEntityRenderer<SheeperEntity, SheeperModel> {
 
 	private static final Identifier TEXTURE = Freaks.of("textures/entity/sheeper/default.png");
 
 	public SheeperRenderer(EntityRendererFactory.Context context) {
-		super(context, new SheeperModel<>(context.getPart(ModEntityRenderers.SHEEPER_LAYER)), 0.5F);
+		super(context, new SheeperModel(context.getPart(ModEntityRenderers.SHEEPER_LAYER)), 0.5F);
 		this.addFeature(new SheeperWoolRenderer(this,
 			context.getPart(ModEntityRenderers.SHEEPER_WOOL_1_LAYER),
 			context.getPart(ModEntityRenderers.SHEEPER_WOOL_2_LAYER),

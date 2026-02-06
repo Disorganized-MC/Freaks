@@ -11,13 +11,13 @@ import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
-public class SheeperWoolRenderer extends FeatureRenderer<SheeperEntity, SheeperModel<SheeperEntity>> {
+public class SheeperWoolRenderer extends FeatureRenderer<SheeperEntity, SheeperModel> {
 
 	public static final Identifier TEXTURE = Freaks.of("textures/entity/sheeper/wool/");
 
 	private final SheeperWoolModel[] woolModels = new SheeperWoolModel[5];
 
-	public SheeperWoolRenderer(FeatureRendererContext<SheeperEntity, SheeperModel<SheeperEntity>> context,
+	public SheeperWoolRenderer(FeatureRendererContext<SheeperEntity, SheeperModel> context,
 		 ModelPart layer1Part,
 		 ModelPart layer2Part,
 		 ModelPart layer3Part,
