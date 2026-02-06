@@ -105,7 +105,7 @@ public abstract class AbstractSheeperEntity extends CreeperEntity implements His
 	}
 
 	public boolean canGrowWool() {
-		return getWoolLayers() <= MAX_WOOL_LAYERS;
+		return getWoolLayers() < MAX_WOOL_LAYERS;
 	}
 
 	@Override

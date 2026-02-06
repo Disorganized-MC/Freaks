@@ -32,9 +32,9 @@ public class MuckRenderer extends MobEntityRenderer<MuckEntity, MuckModel<MuckEn
 		matrixStack.scale(0.999F, 0.999F, 0.999F);
 		matrixStack.translate(0.0F, 0.001F, 0.0F);
 		float size = (float)slimeEntity.getSize();
-		float i = MathHelper.lerp(f, slimeEntity.lastStretch, slimeEntity.stretch) / (size * 0.5F + 1.0F);
-		float j = 1.0F / (i + 1.0F);
-		matrixStack.scale(j * size, 1.0F / j * size, j * size);
+		float squishSize = MathHelper.lerp(f, slimeEntity.lastStretch, slimeEntity.stretch) / (size * 0.5F + 1.0F);
+		float width = 1.0F / (squishSize + 1.0F);
+		matrixStack.scale(width * size, 1.0F / width * size, width * size);
 	}
 
 	@Override

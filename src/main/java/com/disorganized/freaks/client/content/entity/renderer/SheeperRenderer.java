@@ -1,7 +1,6 @@
 package com.disorganized.freaks.client.content.entity.renderer;
 
 import com.disorganized.freaks.Freaks;
-import com.disorganized.freaks.client.content.entity.feature.SheeperWoolRenderer;
 import com.disorganized.freaks.client.content.entity.model.SheeperModel;
 import com.disorganized.freaks.client.registry.ModEntityRenderers;
 import com.disorganized.freaks.content.entity.SheeperEntity;
@@ -17,7 +16,12 @@ public class SheeperRenderer extends MobEntityRenderer<SheeperEntity, SheeperMod
 
 	public SheeperRenderer(EntityRendererFactory.Context context) {
 		super(context, new SheeperModel<>(context.getPart(ModEntityRenderers.SHEEPER_LAYER)), 0.5F);
-		this.addFeature(new SheeperWoolRenderer(this, context.getModelLoader()));
+		this.addFeature(new SheeperWoolRenderer(this,
+			context.getPart(ModEntityRenderers.SHEEPER_WOOL_1_LAYER),
+			context.getPart(ModEntityRenderers.SHEEPER_WOOL_2_LAYER),
+			context.getPart(ModEntityRenderers.SHEEPER_WOOL_3_LAYER),
+			context.getPart(ModEntityRenderers.SHEEPER_WOOL_4_LAYER)
+		));
 	}
 
 	protected void scale(SheeperEntity entity, MatrixStack matrixStack, float f) {
