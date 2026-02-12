@@ -1,7 +1,6 @@
 package com.disorganized.freaks.content.entity.ai.goal;
 
 import com.disorganized.freaks.content.entity.AbstractSheeperEntity;
-import com.disorganized.freaks.content.entity.AbstractSheeperEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.TargetPredicate;

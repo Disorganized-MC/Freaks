@@ -1,0 +1,34 @@
+{
+	"type": "minecraft:block",
+	"pools": [
+		{
+			"rolls": 1,
+			"entries": [
+				{
+					"type": "minecraft:item",
+					"name": "minecraft:slime_ball",
+					"functions": [
+						{
+							"enchantment": "minecraft:fortune",
+							"formula": "minecraft:ore_drops",
+							"function": "minecraft:apply_bonus"
+						},
+						{
+							"function": "minecraft:explosion_decay"
+						}
+					]
+				}
+			],
+			"conditions": [
+				{
+					"condition": "minecraft:block_state_property",
+					"block": "freaks:living_muck",
+					"properties": {
+						"hydrated": "true"
+					}
+				}
+			]
+		}
+	],
+	"random_sequence": "freaks:blocks/living_muck"
+}

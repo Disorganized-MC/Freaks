@@ -4,7 +4,6 @@ import com.disorganized.freaks.content.entity.SturdyFallingBlockEntity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.FallingBlockEntity;
@@ -50,14 +49,13 @@ public abstract class FallingBlockEntityMixin extends Entity implements SturdyFa
 
 	@ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;canPlaceAt(Lnet/minecraft/world/WorldView;Lnet/minecraft/util/math/BlockPos;)Z"))
 	private boolean sturdyCanPlaceAt(boolean canPlaceAt, @Local BlockState state) {
-		if (this.isSturdy()) {
-			if (state.isReplaceable()) return true;
-			return switch (state.getPistonBehavior()) {
-				case DESTROY, IGNORE -> true;
-				default -> false;
-			};
-		}
-		return canPlaceAt;
+		if (!this.isSturdy()) return canPlaceAt;
+
+		if (state.isReplaceable()) return true;
+		return switch (state.getPistonBehavior()) {
+			case DESTROY, IGNORE -> true;
+			default -> false;
+		};
 	}
 
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))

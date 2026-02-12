@@ -8,10 +8,11 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.cache.object.GeoBone;
 import software.bernie.geckolib.renderer.GeoRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
-import software.bernie.geckolib.util.RenderUtil;
 
 public class SheeperWoolLayer extends GeoRenderLayer<SheeperEntity> {
 
@@ -35,7 +36,9 @@ public class SheeperWoolLayer extends GeoRenderLayer<SheeperEntity> {
 
 		poseStack.push();
 //		poseStack.translate(0, -0.333f, 0);
-		RenderUtil.rotateMatrixAroundBone(poseStack, bakedModel.getBone("body").orElseThrow());
+//		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
+		rotateMatrixAroundBone(poseStack, bakedModel.getBone("body").orElseThrow());
+//		poseStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(-180));
 
 		int layer = animatable.getWoolLayers();
 		String modifier = animatable.isOnFire() ? "lit" : "default";
@@ -47,4 +50,16 @@ public class SheeperWoolLayer extends GeoRenderLayer<SheeperEntity> {
 		this.getRenderer().reRender(model, poseStack, bufferSource, animatable, type, bufferSource.getBuffer(type), partialTick, packedLight, OverlayTexture.DEFAULT_UV, -1);
 		poseStack.pop();
 	}
+
+	public static void rotateMatrixAroundBone(MatrixStack poseStack, GeoBone bone) {
+		if (bone.getRotZ() != 0)
+			poseStack.multiply(RotationAxis.POSITIVE_Z.rotation(-bone.getRotZ()));
+
+		if (bone.getRotY() != 0)
+			poseStack.multiply(RotationAxis.POSITIVE_Y.rotation(bone.getRotY()));
+
+		if (bone.getRotX() != 0)
+			poseStack.multiply(RotationAxis.POSITIVE_X.rotation(bone.getRotX()));
+	}
+
 }

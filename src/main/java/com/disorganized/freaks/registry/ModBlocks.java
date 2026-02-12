@@ -27,9 +27,10 @@ public class ModBlocks {
 			.burnable()
     ));
 	public static final Block LIVING_MUCK = register("living_muck", new LivingMuckBlock(
-		AbstractBlock.Settings.create()
-			.mapColor(MapColor.BROWN)
+		AbstractBlock.Settings.copy(Blocks.DIRT)
+			.strength(1.0F, 3.0F)
 			.sounds(BlockSoundGroup.MUD)
+			.mapColor(MapColor.BROWN)
 	));
 
     private static Block register(String path, Block block) {

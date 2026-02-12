@@ -16,6 +16,8 @@ import net.minecraft.util.math.random.Random;
 public class LivingMuckBlock extends Block {
 
 	public static final BooleanProperty HYDRATED = BooleanProperty.of("hydrated");
+	public static final float FORMING_CHANCE = 0.5F;
+	public static final float DECAYING_CHANCE = 0.5F;
 
 	public LivingMuckBlock(Settings settings) {
 		super(settings);
@@ -27,8 +29,6 @@ public class LivingMuckBlock extends Block {
 		builder.add(HYDRATED);
 	}
 
-	public static final int MUCK_FORMING_CHANCE = 1;
-
 	@Override
 	public boolean hasRandomTicks(BlockState state) {
 		return true;
@@ -38,18 +38,18 @@ public class LivingMuckBlock extends Block {
 	public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 		if (FarmlandBlock.isWaterNearby(world, pos) || world.hasRain(pos.up())) {
 			if (!state.get(HYDRATED)) world.setBlockState(pos, state.with(HYDRATED, true));
-			if (random.nextInt(MUCK_FORMING_CHANCE) == 0) tryFormingMuck(world, pos);
+			if (random.nextFloat() < FORMING_CHANCE) tryFormingMuck(world, pos);
 		} else {
 			if (state.get(HYDRATED)) world.setBlockState(pos, state.with(HYDRATED, false));
+			if (random.nextFloat() < DECAYING_CHANCE) world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		}
 	}
 
 	public void tryFormingMuck(ServerWorld world, BlockPos pos) {
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
-		MuckEntity entity = ModEntityTypes.MUCK.create(world);
-		if (entity == null) return;
-
+		MuckEntity entity = new MuckEntity(world);
 		entity.setPosition(Vec3d.of(pos));
+		entity.setSize(1, false);
 		world.spawnEntity(entity);
 	}
 

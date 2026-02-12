@@ -16,12 +16,19 @@ public class CreeperEntityMixin implements HissingEntity {
 
 	@Shadow public int fuseTime;
 
-	@Redirect(method = {"handleFallDamage", "tick", "getClientFuseTime"}, at = @At(value = "FIELD", target = "Lnet/minecraft/entity/mob/CreeperEntity;fuseTime:I", opcode = Opcodes.GETFIELD))
+	@Redirect(
+		method = {"handleFallDamage", "tick", "getClientFuseTime"},
+		at = @At(value = "FIELD", target = "Lnet/minecraft/entity/mob/CreeperEntity;fuseTime:I", opcode = Opcodes.GETFIELD)
+	)
 	private int getProperFuseTime(CreeperEntity instance) {
 		return ((HissingEntity)instance).getFuseTime();
 	}
 
-	@ModifyArg(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;playSound(Lnet/minecraft/sound/SoundEvent;FF)V"), index = 0)
+	@ModifyArg(
+		method = "tick",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/mob/CreeperEntity;playSound(Lnet/minecraft/sound/SoundEvent;FF)V"),
+		index = 0
+	)
 	private SoundEvent useCustomPrimedSound(SoundEvent par1) {
 		return this.getPrimedSound();
 	}

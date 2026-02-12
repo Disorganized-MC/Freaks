@@ -1,18 +1,16 @@
 package com.disorganized.freaks.client.content.entity.renderer;
 
 import com.disorganized.freaks.Freaks;
-import com.disorganized.freaks.content.entity.MudBubbleEntity;
-import net.minecraft.client.render.*;
+import com.disorganized.freaks.content.entity.projectile.MudBubbleEntity;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.projectile.DragonFireballEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RotationAxis;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public class MudBubbleRenderer extends EntityRenderer<MudBubbleEntity> {
 

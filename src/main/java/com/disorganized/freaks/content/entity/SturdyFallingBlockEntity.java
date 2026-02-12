@@ -2,7 +2,10 @@ package com.disorganized.freaks.content.entity;
 
 public interface SturdyFallingBlockEntity {
 
-	boolean isSturdy();
-	void setSturdy(boolean sturdy);
+	default boolean isSturdy() {
+		return true;
+	}
+
+	default void setSturdy(boolean sturdy) {}
 
 }

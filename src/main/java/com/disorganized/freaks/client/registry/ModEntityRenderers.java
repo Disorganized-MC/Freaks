@@ -2,15 +2,12 @@ package com.disorganized.freaks.client.registry;
 
 import com.disorganized.freaks.Freaks;
 import com.disorganized.freaks.client.content.entity.model.MuckModel;
-import com.disorganized.freaks.client.content.entity.model.SheeperModel;
-import com.disorganized.freaks.client.content.entity.model.SheeperWoolModel;
 import com.disorganized.freaks.client.content.entity.renderer.MuckRenderer;
 import com.disorganized.freaks.client.content.entity.renderer.MudBubbleRenderer;
 import com.disorganized.freaks.client.content.entity.renderer.SheeperRenderer;
 import com.disorganized.freaks.registry.ModEntityTypes;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.model.Dilation;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 
 public class ModEntityRenderers {

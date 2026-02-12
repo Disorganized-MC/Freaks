@@ -1,7 +1,6 @@
 package com.disorganized.freaks.content.entity;
 
 import com.disorganized.freaks.registry.ModSoundEvents;
-import net.minecraft.component.ComponentMapImpl;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.damage.DamageSource;
@@ -12,9 +11,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
 
 public class SheeperEntity extends AbstractSheeperEntity {
 
